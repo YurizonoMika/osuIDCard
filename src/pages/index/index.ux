@@ -1,0 +1,95 @@
+<template>
+  <div class="demo-page">
+    <text class="title">欢迎</text>
+    <input class="btn" type="button" value="登录osu账户" onclick="routeSign" style="visiblity:{{logonStatus?hidden:visible}}"/>
+  </div>
+
+</template>
+
+<script>
+import router from "@system.router"
+import storage from "@system.storage"
+var logonStatus=false
+var osuKey=null
+export default {
+
+  // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
+  private: {
+    
+  },
+/*  onShow(){
+    storage.get({
+      key: 'osuKeyStoraged',
+      default:null,
+      success:function(data){
+        console.log('Get osu Account Passkey Success')
+        this.osuKey=data
+        },
+      fail:  function(data){
+        console.log(`Get osu Passkey Failed`)
+      }
+})
+  if(this.osuKey==undefined){
+    this.logonStatus=false
+    console.log("No osu Key")
+    }
+  else{
+    this.logonStatus=true
+    console.log("Detected osu Key,Your Key is :"+this.osuKey)
+    }
+  },*/
+  onShow() {
+  storage.get({
+    key: 'osuKeyStoraged',
+    success: (data) => { // 使用箭头函数，this 指向正确
+      console.log('Get osu Account Passkey Success');
+      
+      if (data) { // storage.get 成功获取到数据
+        this.osuKey = data;
+        this.logonStatus = true;
+        console.log("Detected osu Key, Your Key is: " + this.osuKey);
+      } else { 
+        this.logonStatus = false;
+        console.log("No osu Key");
+      }
+    },
+    fail: (data) => {
+      this.logonStatus = false;
+      console.log(`Get osu Passkey Failed`);
+    }
+  });
+},
+  routeSign() {
+    router.push({
+      uri: "/pages/sign"
+    })
+  }
+}
+</script>
+
+<style>
+.demo-page {
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+}
+
+.title {
+  left:30px;
+  top:30px;
+  color:white;
+  font-size: 60px;
+  text-align: center;
+  font-weight:bold;
+}
+
+.btn {
+  width: 200px;
+  height: 40px;
+  margin-top: 20px;
+  border-radius: 5px;
+  background-color: #09ba07;
+  font-size: 20px;
+  color: #ffffff;
+}
+</style>

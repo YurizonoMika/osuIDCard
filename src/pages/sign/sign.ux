@@ -1,0 +1,147 @@
+<import name="input-method" src="../../components/InputMethod/InputMethod.ux"></import>
+<template>
+  <div class="demo-page">
+    <div class="demo-page" style="top:10px">
+    <text class="title">绑定您的osu账号</text>
+    <text style="font-size:10px"></text>
+    <div class="input_container" style="border-color: {{boxBorder}}" @click="changeState">    
+      <text class="input_text" @click="changeState">
+      {{textValue}}
+      </text>
+    </div>
+    <div>
+    <input class="btn" type="button" value="返回" onclick="exitLogin"/>
+    <input class="btn" type="button" value="保存密钥" onclick="saveOAuthKey" style="background-color:deepskyblue;width:150px"/>
+    </div>
+  </div>
+    <input-method
+      hide="{{hide}}"
+      keyboardtype="{{keyboardtype}}"
+      maxlength="5"
+      vibratemode="{{vibratemode}}"
+      screentype="{{screentype}}"
+      @visibility-change="onVisibilityChange"
+      @key-down="onKeyDown"
+      @delete="onDelete"
+      @complete="onComplete"
+    ></input-method>
+  </div>
+  
+</template>
+
+<script>
+import prompt from '@system.prompt'
+import route from '@system.router'
+import storage from '@system.storage'
+var boxBorderStatus="aliceblue"
+var keyValue=null
+export default {
+  private: {
+    defalutText:"点击输入客户端密钥",
+    textValue: "",
+    hide: true,
+    keyboardtype: "QWERTY", //QWERTY, T9
+    vibratemode: "short",
+    screentype: "rect", //pill-shaped, rect, circle
+    boxBorder: boxBorderStatus
+  },
+  exitLogin(){
+    route.back({uri:'pages/index'})
+  },
+  saveOAuthKey(){
+    keyValue=this.textValue
+    if(keyValue==this.defalutText) keyValue=undefined
+    console.log("Will write your key to storage :")
+    storage.set({
+      key:'osuKeyStoraged',
+      value:keyValue,
+      success:function(){
+        prompt.showToast({message:'已保存'})
+        console.log("Key written!")
+      },
+      fail:function(){
+        prompt.showToast({message:'保存失败，请重试'})
+      }
+    })
+    
+  },
+  onInit(){
+    this.textValue=this.defalutText;
+  },
+  onVisibilityChange(evt) {
+    console.log("显示状态变更:"+JSON.stringify(evt));
+  },
+  onKeyDown(evt) {
+    if(this.textValue.length==10){
+      this.boxBorder="red";
+      prompt.showToast({message:'授权码长度最大为40'});
+    }
+    
+    console.log("按下按键:"+JSON.stringify(evt));
+  },
+  onDelete() {
+    this.textValue = this.textValue.slice(0, -1);
+    if(this.textValue.length<10){
+      this.boxBorder="aliceblue";
+    }
+    console.log("删除字符");
+  },
+  changeState() {
+    this.hide = false;
+    if(this.textValue==this.defalutText){
+      this.textValue="";
+    }
+
+  },
+  onComplete(evt) {
+    if(this.textValue.length==10){
+      this.boxBorderStatus="red";
+      return;
+    }
+    this.boxBorder="aliceblue"
+    this.textValue += evt.detail.content;
+    console.log("返回字符:"+JSON.stringify(evt));
+  },
+}
+</script>
+
+<style>
+.input_text{
+  font-size: 25px;
+  margin-left:10px;
+  margin-right: 10px;
+}
+.demo-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+}
+.btn {
+  width: 120px;
+  height: 60px;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 20px;
+  background-color: orange;
+  font-size: 30px;
+  color: #ffffff;
+  align-self: flex-start;
+}
+.title {
+  font-weight: bold;
+  align-self: flex-start;
+  color:white;
+  font-size: 35px;
+}
+.input_container{
+  height: 90px;
+  width: 360px;
+  border-radius:30px;
+  border-style:solid;
+  border-width: 3px;
+  background-color:grey;
+}
+</style>

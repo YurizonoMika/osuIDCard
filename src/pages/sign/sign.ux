@@ -38,7 +38,6 @@ import fetch from '@system.fetch'
 var boxBorderStatus="aliceblue"
 var keyValue=null
 var userToken=undefined
-const clientID = 'osu_vela'; // 你的 Client ID
 
 
 export default {
@@ -109,8 +108,7 @@ export default {
     });
   },
   onInit(){
-    //this.textValue=this.defaultText;
-    this.textValue='c6d12da2cc3b5cdcc7b86ec9cc34255b0466ac04'
+    this.textValue=this.defaultText;
   },
   onVisibilityChange(evt) {
     console.log("显示状态变更:"+JSON.stringify(evt));

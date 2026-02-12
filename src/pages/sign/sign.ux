@@ -2,7 +2,7 @@
 <template>
   <div class="demo-page">
     <div class="demo-page" style="top:10px">
-    <text class="title">绑定您的osu账号</text>
+    <text class="title">绑定API Key</text>
     <text style="font-size:10px"></text>
     <div class="input_container" style="border-color: {{boxBorder}}" @click="changeState">    
       <text class="input_text" @click="changeState">
@@ -11,7 +11,8 @@
     </div>
     <div>
     <input class="btn" type="button" value="返回" onclick="exitLogin"/>
-    <input class="btn" type="button" value="保存密钥" onclick="saveOAuthKey" style="background-color:deepskyblue;width:150px"/>
+    <input class="btn" type="button" value="保存密钥" onclick="saveOAuthKey" style="background-color:powderblue;width:130px"/>
+    <input class="btn" type="button" value="验证密钥" onclick="testOAuthKey" style="background-color:pink;width:130px"/>
     </div>
   </div>
     <input-method
@@ -33,11 +34,16 @@
 import prompt from '@system.prompt'
 import route from '@system.router'
 import storage from '@system.storage'
+import fetch from '@system.fetch'
 var boxBorderStatus="aliceblue"
 var keyValue=null
+var userToken=undefined
+const clientID = 'osu_vela'; // 你的 Client ID
+
+
 export default {
   private: {
-    defalutText:"点击输入客户端密钥",
+    defaultText:"点击输入客户端密钥",
     textValue: "",
     hide: true,
     keyboardtype: "QWERTY", //QWERTY, T9
@@ -49,56 +55,94 @@ export default {
     route.back({uri:'pages/index'})
   },
   saveOAuthKey(){
-    keyValue=this.textValue
-    if(keyValue==this.defalutText) keyValue=undefined
-    console.log("Will write your key to storage :")
+    keyValue=this.textValue;
+    if(keyValue==this.defaultText) keyValue=undefined;
+    if(keyValue==undefined||keyValue==''){
+      prompt.showToast({message:'密钥为空'});
+      this.boxBorder="red";
+      return;
+    }
+    console.log("Will write your key to storage");
     storage.set({
       key:'osuKeyStoraged',
       value:keyValue,
       success:function(){
         prompt.showToast({message:'已保存'})
-        console.log("Key written!")
+        console.log("Key written!");
       },
       fail:function(){
-        prompt.showToast({message:'保存失败，请重试'})
+        prompt.showToast({message:'保存失败，请重试'});
       }
     })
     
   },
+  testOAuthKey(){
+    var url = 'https://osu.ppy.sh/api/get_user?k=' + this.textValue + '&u=35020720&type=id';
+    fetch.fetch({
+    url: url,
+    method: 'GET',
+    success: function(ret) {
+        try {
+            let data;
+            if (typeof ret.data === 'object') {
+                data = ret.data;
+            } else {
+                data = JSON.parse(ret.data);
+            }
+            if (data && data.length > 0) {
+                const user = data[0];
+                console.log('--- 成功获取数据 ---');
+                console.log('用户名: ' + user.username);
+                console.log('当前PP: ' + user.pp_raw);
+                console.log('全球排名: ' + user.pp_rank);
+                prompt.showToast({message:'API密钥可用'})
+            } else {
+                console.log('未找到用户，请检查 UID 或 API Key');
+            }
+        } catch (e) {
+            console.log('解析逻辑崩溃: ' + e.message);
+        }
+    },
+    fail: function(msg, code) {
+        console.log('网络请求失败: ' + msg);
+    }
+    });
+  },
   onInit(){
-    this.textValue=this.defalutText;
+    //this.textValue=this.defaultText;
+    this.textValue='c6d12da2cc3b5cdcc7b86ec9cc34255b0466ac04'
   },
   onVisibilityChange(evt) {
     console.log("显示状态变更:"+JSON.stringify(evt));
   },
   onKeyDown(evt) {
-    if(this.textValue.length==10){
+    if(this.textValue.length==40){
       this.boxBorder="red";
       prompt.showToast({message:'授权码长度最大为40'});
     }
-    
+    if(this.textValue.length<40){
+      this.boxBorder="aliceblue";
+    }
     console.log("按下按键:"+JSON.stringify(evt));
   },
   onDelete() {
     this.textValue = this.textValue.slice(0, -1);
-    if(this.textValue.length<10){
+    if(this.textValue.length<40){
       this.boxBorder="aliceblue";
     }
     console.log("删除字符");
   },
   changeState() {
     this.hide = false;
-    if(this.textValue==this.defalutText){
+    if(this.textValue==this.defaultText){
       this.textValue="";
     }
 
   },
   onComplete(evt) {
-    if(this.textValue.length==10){
-      this.boxBorderStatus="red";
+    if(this.textValue.length==40){
       return;
     }
-    this.boxBorder="aliceblue"
     this.textValue += evt.detail.content;
     console.log("返回字符:"+JSON.stringify(evt));
   },
@@ -119,15 +163,15 @@ export default {
   text-align: left;
 }
 .btn {
-  width: 120px;
+  width: 110px;
   height: 60px;
   margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
   border-radius: 20px;
-  background-color: orange;
-  font-size: 30px;
-  color: #ffffff;
+  background-color: lightsalmon;
+  font-size: 25px;
+  color: #222222;
   align-self: flex-start;
 }
 .title {
@@ -142,6 +186,6 @@ export default {
   border-radius:30px;
   border-style:solid;
   border-width: 3px;
-  background-color:grey;
+  background-color:#AAAAAA;
 }
 </style>

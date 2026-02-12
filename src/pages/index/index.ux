@@ -1,7 +1,8 @@
 <template>
   <div class="demo-page">
     <text class="title">欢迎</text>
-    <input class="btn" type="button" value="登录osu账户" onclick="routeSign" style="visiblity:{{logonStatus?hidden:visible}}"/>
+    <input class="btn" type="button" value="设置API Key" onclick="routeSign" style="visiblity:{{Status?hidden:visible}}"/>
+    <input class="btn" type="button" value="设置UID" onclick="routeSign" style="visiblity:{{Status?hidden:visible}}"/>
   </div>
 
 </template>
@@ -15,29 +16,8 @@ export default {
 
   // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
   private: {
-    
+    Status:logonStatus
   },
-/*  onShow(){
-    storage.get({
-      key: 'osuKeyStoraged',
-      default:null,
-      success:function(data){
-        console.log('Get osu Account Passkey Success')
-        this.osuKey=data
-        },
-      fail:  function(data){
-        console.log(`Get osu Passkey Failed`)
-      }
-})
-  if(this.osuKey==undefined){
-    this.logonStatus=false
-    console.log("No osu Key")
-    }
-  else{
-    this.logonStatus=true
-    console.log("Detected osu Key,Your Key is :"+this.osuKey)
-    }
-  },*/
   onShow() {
   storage.get({
     key: 'osuKeyStoraged',

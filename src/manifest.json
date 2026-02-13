@@ -40,6 +40,15 @@
       },
       "pages/sign": {
         "component": "sign"
+      },
+      "pages/bind": {
+        "component": "bind"
+      },
+      "pages/remove":{
+        "component": "remove"
+      },
+      "pages/config": {
+        "component": "config"
       }
     }
   }

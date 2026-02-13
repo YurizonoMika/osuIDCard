@@ -1,0 +1,108 @@
+<template>
+  <div class="demo-page">
+    <div class="banner">
+      <text class="title">确定删除用户信息吗</text>
+      <text></text>
+      <text class="defaultText">将清空API Key信息和UID信息</text>
+      <text class="defaultText">此操作不可逆，请三思而后行</text>
+      <text class="defaultText">应用将退出以应用更改</text>
+      <text></text>
+    </div>
+    <div class="menu">
+      <input class="btn" type="button" value="是的，我确定" onclick="delUser" style="color:red"/>
+      <input class="btn" type="button" value="不，请不要这么做" onclick="exit" />
+    </div>
+  </div>
+
+</template>
+
+<script>
+import router from "@system.router"
+import prompt from "@system.prompt"
+import storage from "@system.storage"
+export default {
+  exit() {
+    router.back({
+      uri: "/pages/config"
+    })
+  },
+ async delUser(){
+  const removeStorage = (key) => {
+      return new Promise((resolve) => {
+        storage.delete({
+          key: key,
+          success: () => {
+            console.log(`已清除: ${key}`);
+            resolve(true);
+          },
+          fail: (data, code) => {
+            console.log(`清除 ${key} 失败: ${code}`);
+            resolve(false); // 即使失败也 resolve，避免 Promise.all 挂起
+          }
+        });
+      });
+    };
+
+    // 2. 并行执行删除操作
+    // 注意：快应用中清除数据建议使用 storage.delete
+    await Promise.all([
+      removeStorage('osuKeyStoraged'),
+      removeStorage('osuUIDStoraged')
+    ]);
+
+    prompt.showToast({message: '配置已清空'});
+    this.exit();
+    this.$app.exit();
+  }
+
+  }
+</script>
+
+<style>
+.defaultText{
+  color:gold;
+  font-size: 25px;
+  text-align: left;
+  font-weight:bold;
+}
+.menu{
+  display:flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+  padding-left:30px;
+  padding-right:30px;
+  width:100%
+}
+.banner{
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  padding-left:30px;
+  padding-top:30px;
+  padding-right:30px; 
+  width:100%;
+}
+.demo-page {
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+}
+
+.title {
+  color:white;
+  font-size: 40px;
+  text-align: center;
+  font-weight:bold;
+}
+
+.btn {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background-color: #222222;
+  font-size: 30px;
+  color: #ffffff;
+}
+</style>

@@ -1,0 +1,82 @@
+<template>
+  <div class="demo-page">
+    <div class="banner">
+      <text class="title">设置</text>
+    </div>
+    <div class="menu">
+      <input class="btn" type="button" value="配置API Key" onclick="routeSign" />
+      <input class="btn" type="button" value="绑定UID" onclick="routeBind" />
+      <input class="btn" type="button" value="回到主页" onclick="routeHome" />
+      <input class="btn" type="button" value="删除用户信息" onclick="routeRemove" style="color:red" />
+    </div>
+  </div>
+
+</template>
+
+<script>
+import router from "@system.router"
+export default {
+  routeRemove(){
+    router.push({
+      uri:"pages/remove"
+    })
+  },
+  routeSign() {
+    router.push({
+      uri: "/pages/sign"
+    })
+  },
+  routeHome(){
+    router.back({
+      uri:"/pages/index"
+    })
+  },
+  routeBind() {
+    router.push({
+      uri: "/pages/bind"
+    })
+  }
+}
+</script>
+
+<style>
+.menu{
+  display:flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+  padding-left:30px;
+  padding-right:30px;
+  width:100%
+}
+.banner{
+  display: flex;
+  align-items: center;
+  padding-left:30px;
+  padding-top:30px;
+  padding-right:30px; 
+  width:100%;
+}
+.demo-page {
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+}
+
+.title {
+  color:white;
+  font-size: 60px;
+  text-align: center;
+  font-weight:bold;
+}
+
+.btn {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background-color: #222222;
+  font-size: 30px;
+  color: #ffffff;
+}
+</style>

@@ -1,8 +1,17 @@
 <template>
   <div class="demo-page">
-    <text class="title">欢迎</text>
-    <input class="btn" type="button" value="设置API Key" onclick="routeSign" style="visiblity:{{Status?hidden:visible}}"/>
-    <input class="btn" type="button" value="设置UID" onclick="routeSign" style="visiblity:{{Status?hidden:visible}}"/>
+    <div class="banner">
+      <text class="title">欢迎</text>
+      <div style="flex:1"></div>
+      <input class="btnSettings" type="button" value="设置" onclick="routeConfig"/>
+    </div>
+    <div class='banner' style="padding-top:0">
+      <text style="color:white;font-size:25px">你好！{{titleWelcomeInfo}}</text>
+      <div style="flex:1"></div>
+      <div class="image_container">
+        <image if="{{uid}}" class="avatar-img" src="https://a.ppy.sh/{{uid}}" />
+      </div>
+    </div>
   </div>
 
 </template>
@@ -10,66 +19,175 @@
 <script>
 import router from "@system.router"
 import storage from "@system.storage"
+import prompt from "@system.prompt"
+import fetch from "@system.fetch"
 var logonStatus=false
 var osuKey=null
-export default {
-
-  // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
-  private: {
-    Status:logonStatus
-  },
-  onShow() {
-  storage.get({
-    key: 'osuKeyStoraged',
-    success: (data) => { // 使用箭头函数，this 指向正确
-      console.log('Get osu Account Passkey Success');
-      
-      if (data) { // storage.get 成功获取到数据
-        this.osuKey = data;
-        this.logonStatus = true;
-        console.log("Detected osu Key, Your Key is: " + this.osuKey);
-      } else { 
-        this.logonStatus = false;
-        console.log("No osu Key");
-      }
+var userID=null
+var signUpflag=false
+var getAPIFlag=false
+var getUIDFlag=false
+var currUserName=''
+var welcomeInfo=''
+function getAccountInfo(){
+    console.log('key:' + osuKey);
+    console.log('uid:' + userID);
+    var url = 'https://osu.ppy.sh/api/get_user?k=' + osuKey + '&u='+ userID + '&type=id';
+    fetch.fetch({
+    url: url,
+    method: 'GET',
+    success: function(ret) {
+        try {
+            let data;
+            if (typeof ret.data === 'object') {
+                data = ret.data;
+            } else {
+                data = JSON.parse(ret.data);
+            }
+            if (data && data.length > 0) {
+                const user = data[0];
+                console.log('--- 成功获取数据 ---');
+                console.log('用户名: ' + user.username);
+                console.log('当前PP: ' + user.pp_raw);
+                console.log('全球排名: ' + user.pp_rank);
+                prompt.showToast({message:'登录成功'});
+                welcomeInfo=user.username;
+                this.signUpflag=true;
+                return;
+            } else {
+                console.log('未找到用户，请检查您的API Key和UID');
+                prompt.showToast({message:'登录信息无效'});
+                signUpflag=false;
+            }
+        } catch (e) {
+            console.log('解析逻辑崩溃: ' + e.message);
+        }
     },
-    fail: (data) => {
-      this.logonStatus = false;
-      console.log(`Get osu Passkey Failed`);
+    fail: function(msg, code) {
+        console.log('网络请求失败: ' + msg);
     }
-  });
-},
-  routeSign() {
-    router.push({
-      uri: "/pages/sign"
+    });
+  }
+  export default {
+  private: {
+    titleWelcomeInfo: '请在设置中登录',
+    uid:userID,
+  },
+
+  // 1. 封装存储读取，使其支持 await
+  getStorage(key) {
+    return new Promise((resolve) => {
+      storage.get({
+        key: key,
+        success: (data) => resolve(data),
+        fail: () => resolve(null)
+      })
     })
+  },
+
+  // 2. 封装 API 请求，使其支持 await 并直接返回数据
+  fetchAccount(key, uid) {
+    return new Promise((resolve) => {
+      const url = `https://osu.ppy.sh/api/get_user?k=${key}&u=${uid}&type=id`;
+      fetch.fetch({
+        url: url,
+        method: 'GET',
+        success: (ret) => {
+          try {
+            let data = typeof ret.data === 'object' ? ret.data : JSON.parse(ret.data);
+            resolve(data && data.length > 0 ? data[0] : null);
+          } catch (e) {
+            resolve(null);
+          }
+        },
+        fail: () => resolve(null)
+      })
+    })
+  },
+
+  // 3. 主逻辑控制
+  async onShow() {
+    console.log('--- 开始加载用户信息 ---');
+    // [并行读取] 两个存储项
+    const [storedKey, storedUID] = await Promise.all([
+      this.getStorage('osuKeyStoraged'),
+      this.getStorage('osuUIDStoraged')
+    ]);
+
+    // 检查本地配置是否存在
+    if (!storedKey || !storedUID) {
+      prompt.showToast({ message: '请先在设置中配置 API Key 和 UID' });
+      return;
+    }
+    this.titleWelcomeInfo='正在加载'
+    // 更新全局/局部变量
+    osuKey = storedKey;
+    userID = storedUID;
+
+    // [等待请求] 获取网络数据
+    const userData = await this.fetchAccount(osuKey, userID);
+
+    if (userData) {
+      console.log('成功获取用户:', userData.username);
+      prompt.showToast({ message: '登录成功' });
+      
+      // 【核心】必须通过 this 赋值给 private 里的变量，界面才会实时刷新
+      this.titleWelcomeInfo = userData.username;
+      this.uid=storedUID;
+      // 如果你有全局变量需要同步：
+      currUserName = userData.username;
+      signUpflag = true;
+    } else {
+      prompt.showToast({ message: '登录信息无效，请检查配置' });
+      this.titleWelcomeInfo = '验证失败';
+    }
+  },
+
+  routeConfig() {
+    router.push({ uri: "/pages/config" })
   }
 }
+
 </script>
 
 <style>
+.avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+}
+.image_container{
+  width:80px;
+  height: 80px;
+  border-radius: 40px;
+}
 .demo-page {
   flex-direction: column;
   justify-content:flex-start;
   align-items:flex-start;
 }
-
+.banner{
+  display: flex;
+  align-items: center;
+  padding-left:30px;
+  padding-top:30px;
+  padding-right:30px; 
+  width:100%;
+}
 .title {
-  left:30px;
-  top:30px;
   color:white;
   font-size: 60px;
   text-align: center;
   font-weight:bold;
 }
 
-.btn {
-  width: 200px;
-  height: 40px;
-  margin-top: 20px;
-  border-radius: 5px;
-  background-color: #09ba07;
-  font-size: 20px;
+.btnSettings {
+  width: 90px;
+  height: 60px;
+  margin-left: auto;
+  border-radius: 20px;
+  background-color: #222222;
+  font-size: 30px;
   color: #ffffff;
 }
 </style>

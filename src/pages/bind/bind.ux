@@ -2,7 +2,7 @@
 <template>
   <div class="demo-page">
     <div class="demo-page" style="top:10px">
-    <text class="title">绑定API Key</text>
+    <text class="title">绑定您的UID</text>
     <text style="font-size:10px"></text>
     <div class="input_container" style="border-color: {{boxBorder}}" @click="changeState">    
       <text class="input_text" @click="changeState">
@@ -11,8 +11,8 @@
     </div>
     <div>
     <input class="btn" type="button" value="返回" onclick="exitLogin"/>
-    <input class="btn" type="button" value="保存密钥" onclick="saveOAuthKey" style="background-color:powderblue;width:130px"/>
-    <input class="btn" type="button" value="验证密钥" onclick="testOAuthKey" style="background-color:pink;width:130px"/>
+    <input class="btn" type="button" value="保存UID" onclick="saveUID" style="background-color:powderblue;width:130px"/>
+    <input class="btn" type="button" value="查找用户" onclick="testUID" style="background-color:pink;width:130px"/>
     </div>
   </div>
     <input-method
@@ -38,11 +38,11 @@ import fetch from '@system.fetch'
 var boxBorderStatus="aliceblue"
 var keyValue=null
 var userToken=undefined
-
+var osuKey=''
 
 export default {
   private: {
-    defaultText:"点击输入客户端密钥",
+    defaultText:"点击输入UID",
     textValue: "",
     hide: true,
     keyboardtype: "QWERTY", //QWERTY, T9
@@ -50,23 +50,44 @@ export default {
     screentype: "rect", //pill-shaped, rect, circle
     boxBorder: boxBorderStatus
   },
+  onShow(){
+    storage.get({
+      key: 'osuKeyStoraged',
+      success: (data) => { 
+        console.log('Get osu Account Passkey Success');
+        if (data) { // storage.get 成功获取到数据
+          osuKey = data;
+          console.log("Detected osu Key, Your Key is: " + this.osuKey);
+          getAPIFlag=true;
+        } else {
+          prompt.showToast({message:'获取API Key失败，请先配置API Key'});
+          console.log("No osu Key");
+          getAPIFlag=false;
+       }
+      },
+      fail: (data) => {
+        getAPIFlag = false;
+        console.log(`Get osu Passkey Failed`);
+     }
+    });
+  },
   exitLogin(){
     route.back({uri:'pages/index'})
   },
-  saveOAuthKey(){
+  saveUID(){
     keyValue=this.textValue;
     if(keyValue==this.defaultText) keyValue=undefined;
     if(keyValue==undefined||keyValue==''){
-      prompt.showToast({message:'密钥为空'});
+      prompt.showToast({message:'UID为空'});
       this.boxBorder="red";
       return;
     }
-    console.log("Will write your key to storage");
+    console.log("Will write your UID to storage");
     storage.set({
-      key:'osuKeyStoraged',
+      key:'osuUIDStoraged',
       value:keyValue,
       success:function(){
-        prompt.showToast({message:'已保存'})
+        prompt.showToast({message:'UID已保存'})
         console.log("Key written!");
       },
       fail:function(){
@@ -75,8 +96,8 @@ export default {
     })
     
   },
-  testOAuthKey(){
-    var url = 'https://osu.ppy.sh/api/get_user?k=' + this.textValue + '&u=35020720&type=id';
+  testUID(){
+    var url = 'https://osu.ppy.sh/api/get_user?k=' + osuKey + '&u=' + this.textValue + '&type=id';
     fetch.fetch({
     url: url,
     method: 'GET',
@@ -96,8 +117,7 @@ export default {
                 console.log('全球排名: ' + user.pp_rank);
                 prompt.showToast({message:'API密钥可用'})
             } else {
-                console.log('未找到用户，请检查您的API Key是否可用');
-                prompt.showToast({message:'API Key验证失败'})
+                console.log('未找到用户，请检查 UID 或 API Key');
             }
         } catch (e) {
             console.log('解析逻辑崩溃: ' + e.message);
@@ -117,7 +137,7 @@ export default {
   onKeyDown(evt) {
     if(this.textValue.length==40){
       this.boxBorder="red";
-      prompt.showToast({message:'授权码长度最大为40'});
+      prompt.showToast({message:'UID长度最大为40'});
     }
     if(this.textValue.length<40){
       this.boxBorder="aliceblue";

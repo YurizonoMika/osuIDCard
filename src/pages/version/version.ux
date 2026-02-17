@@ -5,10 +5,15 @@
       <text class="title">更新与帮助</text>
       <text></text>
     </div>
+    <div class="imageContainer">
+      <image src="../../common/logo.png" />
+    </div>
     <div class="content">
+      <text class="defaultText">腕上OSU身份卡</text>
       <text class="defaultText">软件版本 {{appVer}}</text>
       <text></text>
       <text class="defaultText indent">在GitHub上查看我们的项目，和获取关于本App的使用方法。</text>
+      <text></text>
       <text class="defaultText">GitHub:YurizonoMika/osu-idcard</text>
       <text></text>
       <text class="defaultText indent">要获取更多信息与帮助，请联系邮箱：the_sly_fox@foxmail.com</text>
@@ -88,7 +93,7 @@ export default {
 
 
 .indent {
-  text-indent: 30px; /* 缩进两个字符单位 */
+  text-indent: 0px; /* 缩进两个字符单位 */
 }
 .btn {
   width: 100%;
@@ -134,6 +139,13 @@ export default {
   font-size: 24px;
   color: #cccccc;
   line-height: 40px;
+}
+.imageContainer{
+  display:flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  padding-top: 15px;
 }
 </style>
 

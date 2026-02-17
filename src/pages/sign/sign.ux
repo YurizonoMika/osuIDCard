@@ -42,7 +42,7 @@ var userToken=undefined
 
 export default {
   private: {
-    defaultText:"点击输入客户端密钥",
+    defaultText:"点击输入API Key",
     textValue: "",
     hide: true,
     keyboardtype: "QWERTY", //QWERTY, T9

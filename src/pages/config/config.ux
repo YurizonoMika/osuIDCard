@@ -1,12 +1,13 @@
 <template>
   <div class="demo-page">
     <div class="banner">
-      <text class="title">设置</text>
+      <text class="goBackBtn" onclick="routeHome">←</text>
+      <text class="title" >设置</text>
     </div>
     <div class="menu">
+      <input class="btn" type="button" value="帮助与支持" onclick="routeInfo" />
       <input class="btn" type="button" value="配置API Key" onclick="routeSign" />
       <input class="btn" type="button" value="绑定UID" onclick="routeBind" />
-      <input class="btn" type="button" value="回到主页" onclick="routeHome" />
       <input class="btn" type="button" value="删除用户信息" onclick="routeRemove" style="color:red" />
     </div>
   </div>
@@ -29,6 +30,11 @@ export default {
   routeHome(){
     router.back({
       uri:"/pages/index"
+    })
+  },
+  routeInfo(){
+    router.push({
+      uri:"/pages/version"
     })
   },
   routeBind() {
@@ -65,7 +71,7 @@ export default {
 
 .title {
   color:white;
-  font-size: 60px;
+  font-size: 50px;
   text-align: center;
   font-weight:bold;
 }
@@ -78,5 +84,17 @@ export default {
   background-color: #222222;
   font-size: 30px;
   color: #ffffff;
+}
+.goBackBtn {
+  margin-right:10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #333333;
+  border: 2px solid #666666;
+  text-align: center;
+  font-size: 24px;
+  color: #cccccc;
+  line-height: 40px;
 }
 </style>

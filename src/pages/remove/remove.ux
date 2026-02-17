@@ -43,8 +43,7 @@ export default {
       });
     };
 
-    // 2. 并行执行删除操作
-    // 注意：快应用中清除数据建议使用 storage.delete
+    //执行删除操作
     await Promise.all([
       removeStorage('osuKeyStoraged'),
       removeStorage('osuUIDStoraged')

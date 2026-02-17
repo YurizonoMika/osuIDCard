@@ -1,0 +1,139 @@
+<template>
+  <div class="demo-page">
+    <div class="banner">
+      <text class="goBackBtn" onclick="exit">←</text>
+      <text class="title">更新与帮助</text>
+      <text></text>
+    </div>
+    <div class="content">
+      <text class="defaultText">软件版本 {{appVer}}</text>
+      <text></text>
+      <text class="defaultText indent">在GitHub上查看我们的项目，和获取关于本App的使用方法。</text>
+      <text class="defaultText">GitHub:YurizonoMika/osu-idcard</text>
+      <text></text>
+      <text class="defaultText indent">要获取更多信息与帮助，请联系邮箱：the_sly_fox@foxmail.com</text>
+      <text></text>
+      <text class="defaultText indent">App内嵌输入法是来自开发者 NEORUAA 的开源组件，要查看详细信息，请转到GitHub：NEORUAA/Vela_input_method</text>
+    </div>
+    <div class="menu">
+      <input class="btn" type="button" value="检查更新" onclick="checkUpdate"/>
+    </div>
+  </div>
+
+</template>
+
+<script>
+import router from "@system.router"
+import app from "@system.app"
+import prompt from "@system.prompt"
+var appInfo;
+var codeName;
+export default {
+  private:{
+    appVer:codeName
+  },
+  onShow(){
+    try {
+      // 2. 获取应用信息
+      const info = app.getInfo();
+      
+      // 3. 兼容性处理：有的平台返回字符串，有的返回对象
+      const appInfo = (typeof info === 'string') ? JSON.parse(info) : info;
+      
+      // 4. 【关键】使用 this.appVer 赋值，这样界面才会响应式更新
+      this.appVer = appInfo.versionName;
+      
+      console.log("当前版本:", this.appVer);
+    } catch (e) {
+      console.error("获取版本失败", e);
+      this.appVer = "未知版本";
+    }
+  },
+  exit() {
+    router.back({
+      uri: "/pages/config"
+    })
+  },
+  checkUpdate(){
+    prompt.showToast({message:"暂不支持"})
+    console.log(codeName)
+  }
+
+  }
+</script>
+
+<style>
+.defaultText{
+  color:#999999;
+  font-size: 25px;
+  text-align: left;
+  font-weight:bold;
+}
+.menu{
+  display:flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+  padding-left:30px;
+  padding-right:30px;
+  width:100%
+}
+
+.demo-page {
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:center;
+  padding-bottom: 50px;
+}
+
+
+.indent {
+  text-indent: 30px; /* 缩进两个字符单位 */
+}
+.btn {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background-color: #222222;
+  font-size: 30px;
+  color: #ffffff;
+}
+.title {
+  color:white;
+  font-size: 50px;
+  text-align: center;
+  font-weight:bold;
+}
+.content{
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  padding-left:30px;
+  padding-top:30px;
+  padding-right:30px; 
+  width:100%;
+}
+.banner{
+  display: flex;
+  align-items: center;
+  padding-left:30px;
+  padding-top:30px;
+  padding-right:30px; 
+  width:100%;
+}
+/* 返回按钮样式 */
+.goBackBtn {
+  margin-right:10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #333333;
+  border: 2px solid #666666;
+  text-align: center;
+  font-size: 24px;
+  color: #cccccc;
+  line-height: 40px;
+}
+</style>
+

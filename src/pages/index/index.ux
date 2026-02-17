@@ -1,16 +1,42 @@
 <template>
-  <div class="demo-page">
+  <div class="demoPage">
     <div class="banner">
       <text class="title">欢迎</text>
       <div style="flex:1"></div>
       <input class="btnSettings" type="button" value="设置" onclick="routeConfig"/>
     </div>
     <div class='banner' style="padding-top:0">
-      <text style="color:white;font-size:25px">你好！{{titleWelcomeInfo}}</text>
+      <text style="color:white;font-size:25px">你好！</text>
+      <text style="color:white; font-size:25px; width:180px; lines:1; {{isAvatarLoadSuccess?'text-overflow:ellipsis':''}}">
+        {{titleWelcomeInfo}}</text>
       <div style="flex:1"></div>
-      <div class="image_container">
-        <image if="{{uid}}" class="avatar-img" src="https://a.ppy.sh/{{uid}}" />
+      <div class="imageContainer">
+        <image if="{{uid && isAvatarLoadSuccess}}" class="avatarImg" src="https://a.ppy.sh/{{uid}}" onerror="handleAvatarError" style="visibility:{{isAvatarLoadSuccess?visible:hidden}}"/>
       </div>
+    </div>
+    <div class="cardContainer">
+      <div class="card cardLeft">
+        <text class="cardLabel">全球排名</text>
+        <text class="cardValue">{{userRank || '--'}}</text>
+      </div>
+    
+      <div class="card cardRight">
+        <text class="cardLabel">当前 PP</text>
+        <text class="cardValue">{{userPP || '--'}}</text>
+      </div>
+    
+      <div class="card cardLeft">
+        <text class="cardLabel">准确率</text>
+        <text class="cardValue">{{userAccuracy ? userAccuracy + '%' : '--'}}</text>
+      </div>
+    
+      <div class="card cardRight">
+        <text class="cardLabel">游玩次数</text>
+        <text class="cardValue">{{userPlaycount || '--'}}</text>
+      </div>
+    </div>
+    <div style="width:100%;flex-direction: column;justify-content:center;align-items:center;">
+    <input type="button" value="编辑卡片" style="font-size:25px;color:white;background-color:#2a2a2a;height:60px;margin-top:10px" onclick="editCard"></input>
     </div>
   </div>
 
@@ -72,9 +98,16 @@ function getAccountInfo(){
   private: {
     titleWelcomeInfo: '请在设置中登录',
     uid:userID,
+    isAvatarLoadSuccess: true,
+    userRank: '',
+    userPP: '',
+    userAccuracy: '',
+    userPlaycount: ''
   },
-
-  // 1. 封装存储读取，使其支持 await
+  onDestroy(){
+    global.runGC();
+  },
+  //封装存储读取，使其支持 await
   getStorage(key) {
     return new Promise((resolve) => {
       storage.get({
@@ -85,7 +118,7 @@ function getAccountInfo(){
     })
   },
 
-  // 2. 封装 API 请求，使其支持 await 并直接返回数据
+  //封装 API 请求，使其支持 await 并直接返回数据
   fetchAccount(key, uid) {
     return new Promise((resolve) => {
       const url = `https://osu.ppy.sh/api/get_user?k=${key}&u=${uid}&type=id`;
@@ -105,10 +138,10 @@ function getAccountInfo(){
     })
   },
 
-  // 3. 主逻辑控制
+  //主逻辑控制
   async onShow() {
     console.log('--- 开始加载用户信息 ---');
-    // [并行读取] 两个存储项
+    //并行读取两个存储项
     const [storedKey, storedUID] = await Promise.all([
       this.getStorage('osuKeyStoraged'),
       this.getStorage('osuUIDStoraged')
@@ -120,51 +153,105 @@ function getAccountInfo(){
       return;
     }
     this.titleWelcomeInfo='正在加载'
-    // 更新全局/局部变量
+    // 更新变量
     osuKey = storedKey;
     userID = storedUID;
 
-    // [等待请求] 获取网络数据
+    //获取网络数据
     const userData = await this.fetchAccount(osuKey, userID);
 
     if (userData) {
       console.log('成功获取用户:', userData.username);
       prompt.showToast({ message: '登录成功' });
       
-      // 【核心】必须通过 this 赋值给 private 里的变量，界面才会实时刷新
+      //必须通过 this 赋值给 private 里的变量，界面才会实时刷新
+      this.showAvatar = true;
       this.titleWelcomeInfo = userData.username;
       this.uid=storedUID;
+      this.userRank = userData.pp_rank;
+      this.userPP = parseFloat(userData.pp_raw).toFixed(2); // 取整
+      this.userAccuracy = parseFloat(userData.accuracy).toFixed(2); // 保留两位小数
+      this.userPlaycount = userData.playcount;
       // 如果你有全局变量需要同步：
       currUserName = userData.username;
       signUpflag = true;
     } else {
-      prompt.showToast({ message: '登录信息无效，请检查配置' });
-      this.titleWelcomeInfo = '验证失败';
+      prompt.showToast({ message: '登录信息无效' });
+      this.titleWelcomeInfo = '验证失败，请检查设置';
+      this.uid=null;
     }
   },
 
   routeConfig() {
     router.push({ uri: "/pages/config" })
+  },
+  handleAvatarError() {
+    this.isAvatarLoadSuccess = false;
+    console.log('图片加载失败，隐藏头像组件');
+  },
+  editCard(){
+    prompt.showToast({message:"暂不支持"})
   }
 }
 
 </script>
 
 <style>
-.avatar-img {
+
+.cardContainer {
+  justify-content:center;
+  align-items:center;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap; 
+  padding-left: 5%;  
+  padding-right: 5%; 
+  margin-top: 20px;
+}
+
+
+.card {
+  width: 47.5%; 
+  background-color: #2a2a2a; 
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.cardLeft {
+  margin-right: 10px;
+}
+.cardRight {
+  margin-left: 10px;
+}
+.cardLabel {
+  color: #aaaaaa;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.cardValue {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: bold;
+}
+.avatarImg {
   width: 80px;
   height: 80px;
   border-radius: 40px;
 }
-.image_container{
+.imageContainer{
   width:80px;
   height: 80px;
   border-radius: 40px;
+  right:5px;
 }
-.demo-page {
+.demoPage {
   flex-direction: column;
   justify-content:flex-start;
   align-items:flex-start;
+  padding-bottom: 20px;
 }
 .banner{
   display: flex;

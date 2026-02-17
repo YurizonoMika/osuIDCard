@@ -50,7 +50,12 @@ export default {
     screentype: "rect", //pill-shaped, rect, circle
     boxBorder: boxBorderStatus
   },
+  onDestroy(){
+    osuKey=null;
+    global.runGC();
+  },
   onShow(){
+    global.runGC();
     storage.get({
       key: 'osuKeyStoraged',
       success: (data) => { 
@@ -115,7 +120,7 @@ export default {
                 console.log('用户名: ' + user.username);
                 console.log('当前PP: ' + user.pp_raw);
                 console.log('全球排名: ' + user.pp_rank);
-                prompt.showToast({message:'API密钥可用'})
+                prompt.showToast({message:'用户存在'})
             } else {
                 console.log('未找到用户，请检查 UID 或 API Key');
             }

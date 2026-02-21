@@ -1,6 +1,6 @@
 # **腕上OSU身份卡**
 
-![App 预览图](/readmeRes/4305CC5DC5387C0C854112F78C249BE0.png)
+<img src="/readmeRes/4305CC5DC5387C0C854112F78C249BE0.png" width="200" height="200">
 
 ## 什么是腕上osu身份卡
   腕上osu身份卡是一款可以在Xiaomi Vela手表和手环上展示您的osu账户信息和成绩的App，目前仍处于开发中。

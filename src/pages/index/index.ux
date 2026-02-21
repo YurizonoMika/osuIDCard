@@ -34,6 +34,11 @@
         <text class="cardLabel">游玩次数</text>
         <text class="cardValue">{{userPlaycount || '--'}}</text>
       </div>
+
+      <div class="cardWide">
+        <text class="cardLabel">上一次游玩</text>
+        <text class="cardValue">null</text>
+      </div>
     </div>
     <div style="width:100%;flex-direction: column;justify-content:center;align-items:center;">
     <input type="button" value="编辑卡片" style="font-size:25px;color:white;background-color:#2a2a2a;height:60px;margin-top:10px" onclick="editCard"></input>
@@ -212,6 +217,15 @@ function getAccountInfo(){
 
 .card {
   width: 47.5%; 
+  background-color: #2a2a2a; 
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.cardWide {
+  width: 100%; 
   background-color: #2a2a2a; 
   border-radius: 15px;
   padding: 20px;

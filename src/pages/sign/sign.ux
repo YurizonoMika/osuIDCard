@@ -90,10 +90,7 @@ export default {
             }
             if (data && data.length > 0) {
                 const user = data[0];
-                console.log('--- 成功获取数据 ---');
-                console.log('用户名: ' + user.username);
-                console.log('当前PP: ' + user.pp_raw);
-                console.log('全球排名: ' + user.pp_rank);
+                console.log('成功获取数据');
                 prompt.showToast({message:'API密钥可用'})
             } else {
                 console.log('未找到用户，请检查您的API Key是否可用');

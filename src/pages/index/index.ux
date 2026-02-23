@@ -6,9 +6,9 @@
       <input class="btnSettings" type="button" value="设置" onclick="routeConfig"/>
     </div>
     <div class='banner' style="padding-top:0">
-      <text style="color:white;font-size:25px">你好！</text>
-      <text style="color:white; font-size:25px; width:180px; lines:1; {{isAvatarLoadSuccess?'text-overflow:ellipsis':''}}">
-        {{titleWelcomeInfo}}</text>
+      <text style="color:white;font-size:30px">你好！</text>
+      <text style="color:white; font-size:30px; width:180px; lines:1; {{isAvatarLoadSuccess?'text-overflow:ellipsis':''}}">
+      {{titleWelcomeInfo}}</text>
       <div style="flex:1"></div>
       <div class="imageContainer">
         <image if="{{uid && isAvatarLoadSuccess}}" class="avatarImg" src="https://a.ppy.sh/{{uid}}" onerror="handleAvatarError" style="visibility:{{isAvatarLoadSuccess?visible:hidden}}"/>
@@ -36,9 +36,11 @@
       </div>
 
       <div class="cardWide">
-        <text class="cardLabel">最近游玩</text>
+        <text class="cardLabel">最佳成绩</text>
         <text class="cardValue" style="margin-bottom:10px;">{{lastPlayedBeatmapName}}</text>
         <text class="cardValue" style="font-size:20px;">ID：{{recentBeatmapID}}</text>
+        <text></text>
+        <text class="cardValue" style="font-size:30px;">得分：{{recentBestScore}}</text>
       </div>
     </div>
     <div style="width:100%;flex-direction: column;justify-content:center;align-items:center;">
@@ -105,7 +107,7 @@ function getAccountInfo(){
   }
   export default {
   private: {
-    titleWelcomeInfo: '请在设置中登录',
+    titleWelcomeInfo: '请登录',
     uid:'',
     isAvatarLoadSuccess: true,
     userRank: '',
@@ -114,6 +116,7 @@ function getAccountInfo(){
     userPlaycount: '',
     recentBeatmapID:'',
     lastPlayedBeatmapName:'',
+    recentBestScore:''
   },
   onDestroy(){
     global.runGC();
@@ -154,7 +157,7 @@ function getAccountInfo(){
       console.warn("请求超时，自动返回 null");
       resolve(null);
     }, 5000)
-      const url = `https://osu.ppy.sh/api/get_user_recent?k=${key}&u=${uid}&m=0&limit=1&type=id`;
+      const url = `https://osu.ppy.sh/api/get_user_best?k=${key}&u=${uid}&m=0&limit=1&type=id`;
       console.log('正在请求最近游玩: ' + url);
       fetch.fetch({
         url: url,
@@ -175,13 +178,13 @@ function getAccountInfo(){
       })
     })
   },
-  fetchBeatmapInfo(key, uid, beatmap) {
+  fetchBeatmapInfo(key, beatmap) {
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
       console.warn("请求超时，自动返回 null");
       resolve(null);
     }, 5000)
-      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&u=${uid}&b=${beatmap}&m=0&limit=1&type=id`;
+      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&b=${beatmap}&m=0&limit=1&type=id`;
       console.log('正在请求谱面信息: ' + url);
       fetch.fetch({
         url: url,
@@ -214,7 +217,7 @@ function getAccountInfo(){
 
     // 检查本地配置是否存在
     if (!storedKey || !storedUID) {
-      this.titleWelcomeInfo = '请先在设置中登录';
+      this.titleWelcomeInfo = '请登录';
       prompt.showToast({ message: '请先在设置中配置 API Key 和 UID' });
       return;
     }
@@ -243,8 +246,9 @@ function getAccountInfo(){
       try{
         const lastPlayInfo = await this.fetchLastplayed(osuKey, userID);
         if(lastPlayInfo && lastPlayInfo.beatmap_id){
-          const lastBeatmapDetail = await this.fetchBeatmapInfo(osuKey, userID, lastPlayInfo.beatmap_id);
+          const lastBeatmapDetail = await this.fetchBeatmapInfo(osuKey, lastPlayInfo.beatmap_id);
           this.recentBeatmapID = lastPlayInfo.beatmap_id;
+          this.recentBestScore = lastPlayInfo.score;
           this.lastPlayedBeatmapName = lastBeatmapDetail ? lastBeatmapDetail.title : '未知谱面';
         }
           else{

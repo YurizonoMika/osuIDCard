@@ -36,12 +36,13 @@
       </div>
 
       <div class="cardWide">
-        <text class="cardLabel">上一次游玩</text>
-        <text class="cardValue">null</text>
+        <text class="cardLabel">最近游玩</text>
+        <text class="cardValue" style="margin-bottom:10px;">{{lastPlayedBeatmapName}}</text>
+        <text class="cardValue" style="font-size:20px;">ID：{{recentBeatmapID}}</text>
       </div>
     </div>
     <div style="width:100%;flex-direction: column;justify-content:center;align-items:center;">
-    <input type="button" value="编辑卡片" style="font-size:25px;color:white;background-color:#2a2a2a;height:60px;margin-top:10px" onclick="editCard"></input>
+    <input type="button" value="切换模式" style="font-size:25px;color:white;background-color:#2a2a2a;height:60px;margin-top:10px" onclick="editCard"></input>
     </div>
   </div>
 
@@ -60,6 +61,9 @@ var getAPIFlag=false
 var getUIDFlag=false
 var currUserName=''
 var welcomeInfo=''
+var lastPlayedBeatmapID=''
+var lastBeatmapName = ''
+
 function getAccountInfo(){
     console.log('key:' + osuKey);
     console.log('uid:' + userID);
@@ -102,12 +106,14 @@ function getAccountInfo(){
   export default {
   private: {
     titleWelcomeInfo: '请在设置中登录',
-    uid:userID,
+    uid:'',
     isAvatarLoadSuccess: true,
     userRank: '',
     userPP: '',
     userAccuracy: '',
-    userPlaycount: ''
+    userPlaycount: '',
+    recentBeatmapID:'',
+    lastPlayedBeatmapName:'',
   },
   onDestroy(){
     global.runGC();
@@ -142,6 +148,60 @@ function getAccountInfo(){
       })
     })
   },
+  fetchLastplayed(key, uid) {
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+      console.warn("请求超时，自动返回 null");
+      resolve(null);
+    }, 5000)
+      const url = `https://osu.ppy.sh/api/get_user_recent?k=${key}&u=${uid}&m=0&limit=1&type=id`;
+      console.log('正在请求最近游玩: ' + url);
+      fetch.fetch({
+        url: url,
+        method: 'GET',
+        success: (ret) => {
+          clearTimeout(timeout);
+          try {
+            let data = typeof ret.data === 'object' ? ret.data : JSON.parse(ret.data);
+            resolve(data && data.length > 0 ? data[0] : null);
+          } catch (e) {
+            resolve(null);
+          }
+        },
+        fail: () => {
+          resolve(null);
+          clearTimeout(timeout);
+        }
+      })
+    })
+  },
+  fetchBeatmapInfo(key, uid, beatmap) {
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+      console.warn("请求超时，自动返回 null");
+      resolve(null);
+    }, 5000)
+      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&u=${uid}&b=${beatmap}&m=0&limit=1&type=id`;
+      console.log('正在请求谱面信息: ' + url);
+      fetch.fetch({
+        url: url,
+        method: 'GET',
+        success: (ret) => {
+          clearTimeout(timeout);
+          try {
+            let data = typeof ret.data === 'object' ? ret.data : JSON.parse(ret.data);
+            resolve(data && data.length > 0 ? data[0] : null);
+          } catch (e) {
+            resolve(null);
+          }
+        },
+        fail: () => {
+          resolve(null);
+          clearTimeout(timeout);
+        }
+      })
+    })
+  },
 
   //主逻辑控制
   async onShow() {
@@ -154,6 +214,7 @@ function getAccountInfo(){
 
     // 检查本地配置是否存在
     if (!storedKey || !storedUID) {
+      this.titleWelcomeInfo = '请先在设置中登录';
       prompt.showToast({ message: '请先在设置中配置 API Key 和 UID' });
       return;
     }
@@ -164,6 +225,7 @@ function getAccountInfo(){
 
     //获取网络数据
     const userData = await this.fetchAccount(osuKey, userID);
+    
 
     if (userData) {
       console.log('成功获取用户:', userData.username);
@@ -177,7 +239,22 @@ function getAccountInfo(){
       this.userPP = parseFloat(userData.pp_raw).toFixed(2); // 取整
       this.userAccuracy = parseFloat(userData.accuracy).toFixed(2); // 保留两位小数
       this.userPlaycount = userData.playcount;
-      // 如果你有全局变量需要同步：
+
+      try{
+        const lastPlayInfo = await this.fetchLastplayed(osuKey, userID);
+        if(lastPlayInfo && lastPlayInfo.beatmap_id){
+          const lastBeatmapDetail = await this.fetchBeatmapInfo(osuKey, userID, lastPlayInfo.beatmap_id);
+          this.recentBeatmapID = lastPlayInfo.beatmap_id;
+          this.lastPlayedBeatmapName = lastBeatmapDetail ? lastBeatmapDetail.title : '未知谱面';
+        }
+          else{
+            this.recentBeatmapID = '';
+            this.lastPlayedBeatmapName = '无记录';
+        }
+    }catch (e) {
+        console.error('获取游玩记录失败', e);
+        this.lastPlayedBeatmapName = '记录加载失败';
+      }
       currUserName = userData.username;
       signUpflag = true;
     } else {

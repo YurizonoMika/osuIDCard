@@ -53,6 +53,9 @@
       "pages/version":{
         "component": "version"
       },
+      "pages/mode":{
+        "component": "mode"
+      },
       "pages/config": {
         "component": "config"
       }

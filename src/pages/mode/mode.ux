@@ -5,10 +5,10 @@
       <text class="title" >选择模式</text>
     </div>
     <div class="menu">
-      <input class="btn" type="button" value="osu!" onclick="setAppMode(0)" />
-      <input class="btn" type="button" value="taiko" onclick="setAppMode(1)" />
-      <input class="btn" type="button" value="catch" onclick="setAppMode(2)" />
-      <input class="btn" type="button" value="mania" onclick="setAppMode(3)" />
+      <input class="btn {{currMode === '0'?'selected':''}}" type="button" value="osu!" onclick="setAppMode('0')" />
+      <input class="btn {{currMode === '1'?'selected':''}}" type="button" value="taiko" onclick="setAppMode('1')" />
+      <input class="btn {{currMode === '2'?'selected':''}}" type="button" value="catch" onclick="setAppMode('2')" />
+      <input class="btn {{currMode === '3'?'selected':''}}" type="button" value="mania" onclick="setAppMode('3')" />
     </div>
   </div>
 
@@ -17,16 +17,32 @@
 <script>
 import router from "@system.router"
 import prompt from "@system.prompt"
+import storage from "@system.storage"
 export default {
+  private:{
+    currMode:'-1'
+  },
+  onShow(){
+  storage.get({
+    key: 'osuMode',
+    success: function(data) {
+      currMode=data
+    },
+    fail: function(data, code) {
+      console.log(`未读取到模式属性 ${code}`)
+    }
+})
+  },
   setAppMode(mode){
     storage.set({
     key: 'osuMode',
     value: mode,
-    success: function(data) {
-      if(mode==0) prompt.showToast({message:'已设置为osu!standard模式'});
-      if(mode==1) prompt.showToast({message:'已设置为osu!Taiko模式'});
-      if(mode==2) prompt.showToast({message:'已设置为osu!catch模式'});
-      if(mode==3) prompt.showToast({message:'已设置为osu!mania模式'});
+    success: (data) => {
+      this.currMode = mode;
+      if(mode==='0') prompt.showToast({message:'已设置为osu!standard模式'});
+      if(mode==='1') prompt.showToast({message:'已设置为osu!Taiko模式'});
+      if(mode==='2') prompt.showToast({message:'已设置为osu!catch模式'});
+      if(mode==='3') prompt.showToast({message:'已设置为osu!mania模式'});
    },
     fail: function(data, code) {
       prompt.showToast({message:`发生未知错误：${code}`})
@@ -92,5 +108,8 @@ export default {
   font-size: 24px;
   color: #cccccc;
   line-height: 40px;
+}
+.selected {
+  background-color: deepskyblue;
 }
 </style>

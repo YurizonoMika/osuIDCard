@@ -15,6 +15,9 @@
       </div>
     </div>
     <div class="cardContainer">
+      <div class="cardWide">
+        <text class="cardValue" style="color:white">游戏模式：{{modeText}}</text>
+      </div>
       <div class="card cardLeft">
         <text class="cardLabel">全球排名</text>
         <text class="cardValue">{{userRank || '--'}}</text>
@@ -44,7 +47,7 @@
       </div>
     </div>
     <div style="width:100%;flex-direction: column;justify-content:center;align-items:center;">
-    <input type="button" value="切换模式" style="font-size:25px;color:white;background-color:#2a2a2a;height:60px;margin-top:10px" onclick="editCard"></input>
+    <input type="button" value="切换模式" style="font-size:25px;color:white;background-color:#2a2a2a;height:60px;margin-top:10px" onclick="editMode"></input>
     </div>
   </div>
 
@@ -65,7 +68,7 @@ var currUserName=''
 var welcomeInfo=''
 var lastPlayedBeatmapID=''
 var lastBeatmapName = ''
-
+var fetchGameMode='1'
 
   export default {
   private: {
@@ -78,7 +81,8 @@ var lastBeatmapName = ''
     userPlaycount: '',
     recentBeatmapID:'',
     lastPlayedBeatmapName:'',
-    recentBestScore:''
+    recentBestScore:'',
+    modeText:''
   },
   onDestroy(){
     global.runGC();
@@ -93,11 +97,20 @@ var lastBeatmapName = ''
       })
     })
   },
+  getGameMode(key) {
+    return new Promise((resolve) => {
+      storage.get({
+        key: key,
+        success: (data) => resolve(data),
+        fail: () => resolve(0)
+      })
+    })
+  },
 
   //封装 API 请求，使其支持 await 并直接返回数据
   fetchAccount(key, uid) {
     return new Promise((resolve) => {
-      const url = `https://osu.ppy.sh/api/get_user?k=${key}&u=${uid}&type=id`;
+      const url = `https://osu.ppy.sh/api/get_user?k=${key}&u=${uid}&m=${fetchGameMode}&type=id`;
       fetch.fetch({
         url: url,
         method: 'GET',
@@ -119,7 +132,7 @@ var lastBeatmapName = ''
       console.warn("请求超时，自动返回 null");
       resolve(null);
     }, 5000)
-      const url = `https://osu.ppy.sh/api/get_user_best?k=${key}&u=${uid}&m=0&limit=1&type=id`;
+      const url = `https://osu.ppy.sh/api/get_user_best?k=${key}&u=${uid}&m=${fetchGameMode}&limit=1&type=id`;
       console.log('正在请求最近游玩: ' + url);
       fetch.fetch({
         url: url,
@@ -146,7 +159,7 @@ var lastBeatmapName = ''
       console.warn("请求超时，自动返回 null");
       resolve(null);
     }, 5000)
-      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&b=${beatmap}&m=0&limit=1&type=id`;
+      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&b=${beatmap}&m=${fetchGameMode}&limit=1&type=id`;
       console.log('正在请求谱面信息: ' + url);
       fetch.fetch({
         url: url,
@@ -172,9 +185,10 @@ var lastBeatmapName = ''
   async onShow() {
     console.log('--- 开始加载用户信息 ---');
     //并行读取两个存储项
-    const [storedKey, storedUID] = await Promise.all([
+    const [storedKey, storedUID, gameMode] = await Promise.all([
       this.getStorage('osuKeyStoraged'),
-      this.getStorage('osuUIDStoraged')
+      this.getStorage('osuUIDStoraged'),
+      this.getGameMode('osuMode')
     ]);
 
     // 检查本地配置是否存在
@@ -187,6 +201,24 @@ var lastBeatmapName = ''
     // 更新变量
     osuKey = storedKey;
     userID = storedUID;
+    fetchGameMode=gameMode;
+
+    switch(gameMode){
+      case '0':
+        this.modeText='osu!std';
+        break;
+      case '1':
+        this.modeText='osu!Taiko';
+        break;
+      case '2':
+        this.modeText='osu!catch';
+        break;
+      case '3':
+        this.modeText='osu!mania';
+        break;
+      default:
+        this.modeText='osu!std';
+    }
 
     //获取网络数据
     const userData = await this.fetchAccount(osuKey, userID);
@@ -237,8 +269,8 @@ var lastBeatmapName = ''
     this.isAvatarLoadSuccess = false;
     console.log('图片加载失败，隐藏头像组件');
   },
-  editCard(){
-    prompt.showToast({message:"暂不支持"})
+  editMode(){
+    router.push({ uri: "/pages/mode" })
   }
 }
 
@@ -268,7 +300,7 @@ var lastBeatmapName = ''
   flex-direction: column;
 }
 .cardWide {
-  width: 100%; 
+  width: 98%; 
   background-color: #2a2a2a; 
   border-radius: 15px;
   padding: 20px;

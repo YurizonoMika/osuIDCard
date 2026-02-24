@@ -25,8 +25,9 @@ export default {
   onShow(){
   storage.get({
     key: 'osuMode',
-    success: function(data) {
-      currMode=data
+    success: (data) => {
+      this.currMode=data
+      console.log('读取到模式属性 mode=' + this.currMode)
     },
     fail: function(data, code) {
       console.log(`未读取到模式属性 ${code}`)
@@ -110,6 +111,6 @@ export default {
   line-height: 40px;
 }
 .selected {
-  background-color: deepskyblue;
+  background-color:royalblue;
 }
 </style>

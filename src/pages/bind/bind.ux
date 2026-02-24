@@ -5,14 +5,14 @@
     <text class="title">绑定您的UID</text>
     <text style="font-size:10px"></text>
     <div class="input_container" style="border-color: {{boxBorder}}" @click="changeState">    
-      <text class="input_text" @click="changeState">
+      <text class="input_text">
       {{textValue}}
       </text>
     </div>
     <div>
     <input class="btn" type="button" value="返回" onclick="exitLogin"/>
-    <input class="btn" type="button" value="保存UID" onclick="saveUID" style="background-color:powderblue;width:130px"/>
-    <input class="btn" type="button" value="查找用户" onclick="testUID" style="background-color:pink;width:130px"/>
+    <input class="btn" type="button" value="保存UID" onclick="saveUID" style="width:130px"/>
+    <input class="btn" type="button" value="查找用户" onclick="testUID" style="width:130px"/>
     </div>
   </div>
     <input-method
@@ -27,7 +27,6 @@
       @complete="onComplete"
     ></input-method>
   </div>
-  
 </template>
 
 <script>
@@ -36,14 +35,14 @@ import route from '@system.router'
 import storage from '@system.storage'
 import fetch from '@system.fetch'
 var boxBorderStatus="aliceblue"
-var keyValue=null
+var keyValue=undefined
 var userToken=undefined
 var osuKey=''
 
 export default {
   private: {
-    defaultText:"点击输入UID",
-    textValue: "",
+    defaultText:'点击此处输入UID',
+    textValue: '',
     hide: true,
     keyboardtype: "QWERTY", //QWERTY, T9
     vibratemode: "short",
@@ -157,7 +156,7 @@ export default {
     console.log("删除字符");
   },
   changeState() {
-    this.hide = false;
+    this.hide = !this.hide;
     if(this.textValue==this.defaultText){
       this.textValue="";
     }
@@ -174,12 +173,16 @@ export default {
 </script>
 
 <style>
+
 .input_text{
   font-size: 25px;
   margin-left:10px;
   margin-right: 10px;
+  color:#EEEEEE
 }
 .demo-page {
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -193,9 +196,9 @@ export default {
   margin-left: 10px;
   margin-right: 10px;
   border-radius: 20px;
-  background-color: lightsalmon;
+  background-color: #333333;
   font-size: 25px;
-  color: #222222;
+  color: #EEEEEE;
   align-self: flex-start;
 }
 .title {
@@ -205,11 +208,11 @@ export default {
   font-size: 35px;
 }
 .input_container{
-  height: 90px;
-  width: 360px;
+  height:20%;
+  width: 90%;
   border-radius:30px;
   border-style:solid;
   border-width: 3px;
-  background-color:#AAAAAA;
+  background-color:#5A5A5A;
 }
 </style>

@@ -66,45 +66,7 @@ var welcomeInfo=''
 var lastPlayedBeatmapID=''
 var lastBeatmapName = ''
 
-function getAccountInfo(){
-    console.log('key:' + osuKey);
-    console.log('uid:' + userID);
-    var url = 'https://osu.ppy.sh/api/get_user?k=' + osuKey + '&u='+ userID + '&type=id';
-    fetch.fetch({
-    url: url,
-    method: 'GET',
-    success: function(ret) {
-        try {
-            let data;
-            if (typeof ret.data === 'object') {
-                data = ret.data;
-            } else {
-                data = JSON.parse(ret.data);
-            }
-            if (data && data.length > 0) {
-                const user = data[0];
-                console.log('--- 成功获取数据 ---');
-                console.log('用户名: ' + user.username);
-                console.log('当前PP: ' + user.pp_raw);
-                console.log('全球排名: ' + user.pp_rank);
-                prompt.showToast({message:'登录成功'});
-                welcomeInfo=user.username;
-                this.signUpflag=true;
-                return;
-            } else {
-                console.log('未找到用户，请检查您的API Key和UID');
-                prompt.showToast({message:'登录信息无效'});
-                signUpflag=false;
-            }
-        } catch (e) {
-            console.log('解析逻辑崩溃: ' + e.message);
-        }
-    },
-    fail: function(msg, code) {
-        console.log('网络请求失败: ' + msg);
-    }
-    });
-  }
+
   export default {
   private: {
     titleWelcomeInfo: '请登录',

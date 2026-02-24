@@ -1,0 +1,96 @@
+<template>
+  <div class="demo-page">
+    <div class="banner">
+      <text class="goBackBtn" onclick="routeHome">←</text>
+      <text class="title" >选择模式</text>
+    </div>
+    <div class="menu">
+      <input class="btn" type="button" value="osu!" onclick="setAppMode(0)" />
+      <input class="btn" type="button" value="taiko" onclick="setAppMode(1)" />
+      <input class="btn" type="button" value="catch" onclick="setAppMode(2)" />
+      <input class="btn" type="button" value="mania" onclick="setAppMode(3)" />
+    </div>
+  </div>
+
+</template>
+
+<script>
+import router from "@system.router"
+import prompt from "@system.prompt"
+export default {
+  setAppMode(mode){
+    storage.set({
+    key: 'osuMode',
+    value: mode,
+    success: function(data) {
+      if(mode==0) prompt.showToast({message:'已设置为osu!standard模式'});
+      if(mode==1) prompt.showToast({message:'已设置为osu!Taiko模式'});
+      if(mode==2) prompt.showToast({message:'已设置为osu!catch模式'});
+      if(mode==3) prompt.showToast({message:'已设置为osu!mania模式'});
+   },
+    fail: function(data, code) {
+      prompt.showToast({message:`发生未知错误：${code}`})
+    }
+})
+  },
+  routeHome(){
+    router.back({
+      uri:"/pages/index"
+    })
+  },
+}
+</script>
+
+<style>
+.menu{
+  display:flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+  padding-left:30px;
+  padding-right:30px;
+  width:100%
+}
+.banner{
+  display: flex;
+  align-items: center;
+  padding-left:30px;
+  padding-top:30px;
+  padding-right:30px; 
+  width:100%;
+}
+.demo-page {
+  flex-direction: column;
+  justify-content:flex-start;
+  align-items:flex-start;
+}
+
+.title {
+  color:white;
+  font-size: 50px;
+  text-align: center;
+  font-weight:bold;
+}
+
+.btn {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background-color: #222222;
+  font-size: 30px;
+  color: #ffffff;
+}
+.goBackBtn {
+  margin-right:10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #333333;
+  border: 2px solid #666666;
+  text-align: center;
+  font-size: 24px;
+  color: #cccccc;
+  line-height: 40px;
+}
+</style>

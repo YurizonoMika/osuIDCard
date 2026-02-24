@@ -1,8 +1,8 @@
 {
   "package": "com.yurizonomika.osucard",
   "name": "osu-idcard",
-  "versionName": "1.0.0-release",
-  "versionCode": 5,
+  "versionName": "1.0.5-release",
+  "versionCode": 10,
   "minPlatformVersion": 1000,
   "icon": "/common/logo.png",
   "deviceTypeList": [

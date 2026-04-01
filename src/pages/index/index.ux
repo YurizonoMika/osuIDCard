@@ -20,7 +20,7 @@
       </div>
       <div class="card cardLeft">
         <text class="cardLabel">全球排名</text>
-        <text class="cardValue">{{userRank || '--'}}</text>
+        <text class="cardValue">#{{userRank || '--'}}</text>
       </div>
     
       <div class="card cardRight">
@@ -39,7 +39,11 @@
       </div>
 
       <div class="cardWide">
-        <text class="cardLabel">最佳成绩</text>
+        <div>
+          <text class="cardLabel">最佳成绩</text>
+          <div style="flex:1"></div>
+          <text class="cardLabel" onclick="routeDetail(recentBeatmapID)">歌曲信息→</text>
+        </div>
         <text class="cardValue" style="margin-bottom:10px;">{{lastPlayedBeatmapName}}</text>
         <text class="cardValue" style="font-size:20px;">ID：{{recentBeatmapID}}</text>
         <text></text>
@@ -262,6 +266,14 @@ var fetchGameMode='1'
     }
   },
 
+  routeDetail(reqSongId){
+    router.push({
+      uri: '/detail',
+      params: {
+      songID: reqSongId
+      }
+    })
+  },
   routeConfig() {
     router.push({ uri: "/pages/config" })
   },
@@ -295,7 +307,7 @@ var fetchGameMode='1'
   background-color: #2a2a2a; 
   border-radius: 15px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10%;
   display: flex;
   flex-direction: column;
 }
@@ -304,7 +316,7 @@ var fetchGameMode='1'
   background-color: #2a2a2a; 
   border-radius: 15px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
 }

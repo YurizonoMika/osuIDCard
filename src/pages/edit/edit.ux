@@ -2,13 +2,36 @@
   <div class="demo-page">
     <div class="banner">
       <text class="goBackBtn" onclick="routeHome">←</text>
-      <text class="title" >选择模式</text>
+      <text class="title" >编辑页面</text>
     </div>
+
+    <div style="height:20px"></div>
+
     <div class="menu">
-      <input class="btn {{currMode === '0'?'selected':''}}" type="button" value="osu!" onclick="setAppMode('0')" />
-      <input class="btn {{currMode === '1'?'selected':''}}" type="button" value="taiko" onclick="setAppMode('1')" />
-      <input class="btn {{currMode === '2'?'selected':''}}" type="button" value="catch" onclick="setAppMode('2')" />
-      <input class="btn {{currMode === '3'?'selected':''}}" type="button" value="mania" onclick="setAppMode('3')" />
+      <text class="subTitle">编辑卡片</text>
+      <text class="tipsText">点击对应选项显隐卡片</text>
+      <div>
+        <input class="btn leftBtn" type="button" value="全球排名"/>
+        <input class="btn rightBtn" type="button" value="当前pp"/>
+      </div>
+      <div>
+        <input class="btn leftBtn" type="button" value="准确率"/>
+        <input class="btn rightBtn" type="button" value="游玩次数"/>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+    <div class="menu">
+      <text class="subTitle">游戏模式</text>
+      <text class="tipsText">选择你要显示的游戏模式的数据</text>
+        <div>
+          <input class="btn {{currMode === '0'?'selected':''}} leftBtn" type="button" value="osu!" onclick="setAppMode('0')" />
+          <input class="btn {{currMode === '1'?'selected':''}} rightBtn" type="button" value="taiko" onclick="setAppMode('1')" />
+        </div>
+        <div>
+          <input class="btn {{currMode === '2'?'selected':''}} leftBtn" type="button" value="catch" onclick="setAppMode('2')" />
+          <input class="btn {{currMode === '3'?'selected':''}} rightBtn" type="button" value="mania" onclick="setAppMode('3')" />
+        </div>
     </div>
   </div>
 
@@ -80,6 +103,7 @@ export default {
   flex-direction: column;
   justify-content:flex-start;
   align-items:flex-start;
+  padding-bottom: 50px;
 }
 
 .title {
@@ -88,11 +112,20 @@ export default {
   text-align: center;
   font-weight:bold;
 }
-
+.subTitle {
+  color:white;
+  font-size: 35px;
+  text-align: center;
+  font-weight:bold;
+}
+.tipsText{
+  color:#cccccc;
+  font-size:25px;
+}
 .btn {
-  width: 100%;
+  width: 50%;
   height: 80px;
-  margin-top: 10px;
+  margin-top: 5%;
   border-radius: 20px;
   background-color: #222222;
   font-size: 30px;
@@ -112,5 +145,11 @@ export default {
 }
 .selected {
   background-color:royalblue;
+}
+.leftBtn{
+  margin-right:2.5%;
+}
+.rightBtn{
+  margin-left:2.5%;
 }
 </style>

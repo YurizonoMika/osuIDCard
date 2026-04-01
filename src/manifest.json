@@ -53,8 +53,8 @@
       "pages/version":{
         "component": "version"
       },
-      "pages/mode":{
-        "component": "mode"
+      "pages/edit":{
+        "component": "edit"
       },
       "pages/config": {
         "component": "config"

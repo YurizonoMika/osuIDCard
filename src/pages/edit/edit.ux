@@ -11,12 +11,16 @@
       <text class="subTitle">编辑卡片</text>
       <text class="tipsText">点击对应选项显隐卡片</text>
       <div>
-        <input class="btn leftBtn" type="button" value="全球排名"/>
-        <input class="btn rightBtn" type="button" value="当前pp"/>
+        <input class="btn leftBtn {{displayConfig[0] === 1?'selected':''}}" type="button" value="全球排名"
+          onclick="changeDisplayMode(0)"/>
+        <input class="btn rightBtn {{displayConfig[1] === 1?'selected':''}}" type="button" value="当前 PP"
+          onclick="changeDisplayMode(1)"/>
       </div>
       <div>
-        <input class="btn leftBtn" type="button" value="准确率"/>
-        <input class="btn rightBtn" type="button" value="游玩次数"/>
+        <input class="btn leftBtn {{displayConfig[2] === 1?'selected':''}}" type="button" value="准确率"
+          onclick="changeDisplayMode(2)"/>
+        <input class="btn rightBtn {{displayConfig[3] === 1?'selected':''}}" type="button" value="游玩次数"
+          onclick="changeDisplayMode(3)"/>
       </div>
     </div>
 
@@ -25,12 +29,12 @@
       <text class="subTitle">游戏模式</text>
       <text class="tipsText">选择你要显示的游戏模式的数据</text>
         <div>
-          <input class="btn {{currMode === '0'?'selected':''}} leftBtn" type="button" value="osu!" onclick="setAppMode('0')" />
-          <input class="btn {{currMode === '1'?'selected':''}} rightBtn" type="button" value="taiko" onclick="setAppMode('1')" />
+          <input class="btn leftBtn {{currMode === '0'?'selected':''}}" type="button" value="osu!" onclick="setAppMode('0')" />
+          <input class="btn rightBtn {{currMode === '1'?'selected':''}}" type="button" value="taiko" onclick="setAppMode('1')" />
         </div>
         <div>
-          <input class="btn {{currMode === '2'?'selected':''}} leftBtn" type="button" value="catch" onclick="setAppMode('2')" />
-          <input class="btn {{currMode === '3'?'selected':''}} rightBtn" type="button" value="mania" onclick="setAppMode('3')" />
+          <input class="btn leftBtn {{currMode === '2'?'selected':''}}" type="button" value="catch" onclick="setAppMode('2')" />
+          <input class="btn rightBtn {{currMode === '3'?'selected':''}}" type="button" value="mania" onclick="setAppMode('3')" />
         </div>
     </div>
   </div>
@@ -42,11 +46,14 @@ import router from "@system.router"
 import prompt from "@system.prompt"
 import storage from "@system.storage"
 export default {
+
   private:{
-    currMode:'-1'
+    currMode:'-1',
+    displayConfig:[0,0,0,0]
   },
   onShow(){
   storage.get({
+    //获取当前模式信息
     key: 'osuMode',
     success: (data) => {
       this.currMode=data
@@ -55,7 +62,17 @@ export default {
     fail: function(data, code) {
       console.log(`未读取到模式属性 ${code}`)
     }
-})
+  });
+  //获取卡片显隐配置
+  storage.get({
+    key: 'cardConfig',
+    success: (data) => {
+      if (data) {
+        // 注意：storage 存取的是字符串，需要转回数组
+        this.displayConfig = JSON.parse(data);
+        }
+      }
+    });
   },
   setAppMode(mode){
     storage.set({
@@ -72,6 +89,20 @@ export default {
       prompt.showToast({message:`发生未知错误：${code}`})
     }
 })
+  },
+  changeDisplayMode(cardId){
+  // 1. 切换状态 (0 -> 1, 1 -> 0)
+  const newState = this.displayConfig[cardId] === 1 ? 0 : 1;
+  // 2. 更新数组 (使用 splice 确保触发视图刷新)
+  this.displayConfig.splice(cardId, 1, newState);
+  // 3. 保存到本地
+  storage.set({
+    key: 'cardConfig',
+    value: JSON.stringify(this.displayConfig), // 数组存入前需转成 JSON 字符串
+    success: () => {
+      console.log('配置已保存');
+    }
+  });
   },
   routeHome(){
     router.back({

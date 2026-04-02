@@ -2,13 +2,10 @@
     <div class="demo-page">
       <div class="banner">
         <text class="goBackBtn" onclick="routeHome">←</text>
-        <text class="title" >设置</text>
+        <text class="title" >歌曲信息</text>
       </div>
       <div class="menu">
-        <input class="btn" type="button" value="帮助与支持" onclick="routeInfo" />
-        <input class="btn" type="button" value="配置API Key" onclick="routeSign" />
-        <input class="btn" type="button" value="绑定UID" onclick="routeBind" />
-        <input class="btn" type="button" value="删除用户信息" onclick="routeRemove" style="color:red" />
+        <input class="btn" type="button" value="页面建设中" />
       </div>
     </div>
   
@@ -17,31 +14,11 @@
   <script>
   import router from "@system.router"
   export default {
-    routeRemove(){
-      router.push({
-        uri:"pages/remove"
-      })
-    },
-    routeSign() {
-      router.push({
-        uri: "/pages/sign"
-      })
-    },
     routeHome(){
       router.back({
         uri:"/pages/index"
       })
     },
-    routeInfo(){
-      router.push({
-        uri:"/pages/version"
-      })
-    },
-    routeBind() {
-      router.push({
-        uri: "/pages/bind"
-      })
-    }
   }
   </script>
   

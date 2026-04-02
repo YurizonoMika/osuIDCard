@@ -46,10 +46,10 @@ import router from "@system.router"
 import prompt from "@system.prompt"
 import storage from "@system.storage"
 export default {
-
   private:{
-    currMode:'-1',
-    displayConfig:[0,0,0,0]
+    currMode: '-1',
+    displayConfig: [0,0,0,0],
+    refreshIndex: false
   },
   onShow(){
   storage.get({
@@ -80,6 +80,7 @@ export default {
     value: mode,
     success: (data) => {
       this.currMode = mode;
+      this.refreshIndex = true;
       if(mode==='0') prompt.showToast({message:'已设置为osu!standard模式'});
       if(mode==='1') prompt.showToast({message:'已设置为osu!Taiko模式'});
       if(mode==='2') prompt.showToast({message:'已设置为osu!catch模式'});
@@ -95,6 +96,7 @@ export default {
   const newState = this.displayConfig[cardId] === 1 ? 0 : 1;
   // 2. 更新数组 (使用 splice 确保触发视图刷新)
   this.displayConfig.splice(cardId, 1, newState);
+  this.refreshIndex = true;
   // 3. 保存到本地
   storage.set({
     key: 'cardConfig',
@@ -105,8 +107,12 @@ export default {
   });
   },
   routeHome(){
+    console.log("refresh status: "+this.refreshIndex)
     router.back({
-      uri:"/pages/index"
+      uri:"/pages/index",
+      params: {
+      needRefresh: this.refreshIndex
+      }
     })
   },
 }

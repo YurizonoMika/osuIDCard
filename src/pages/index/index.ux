@@ -42,7 +42,7 @@
         <div>
           <text class="cardLabel">最佳成绩</text>
           <div style="flex:1"></div>
-          <text class="cardLabel" onclick="routeDetail(recentBeatmapID)">歌曲信息→</text>
+          <text class="cardLabel" onclick="routeDetail(recentBeatmapID)" if="{{canViewDetail == true}}"> 歌曲信息→ </text>
         </div>
         <text class="cardValue" style="margin-bottom:10px;">{{lastPlayedBeatmapName}}</text>
         <text class="cardValue" style="font-size:20px;">ID：{{recentBeatmapID}}</text>
@@ -75,6 +75,9 @@ var lastBeatmapName = ''
 var fetchGameMode='1'
 
   export default {
+    public:{
+    needRefresh: true,
+  },
   private: {
     titleWelcomeInfo: '请登录',
     uid:'',
@@ -85,9 +88,11 @@ var fetchGameMode='1'
     userPlaycount: '',
     recentBeatmapID:'',
     lastPlayedBeatmapName:'',
-    recentBestScore:'',
+    recentBestScore:'0',
     displayConfig: [0, 0, 0, 0],
-    modeText:''
+    modeText:'',
+    canViewDetail: false,
+    needRefresh: null
   },
   onDestroy(){
     global.runGC();
@@ -134,9 +139,9 @@ var fetchGameMode='1'
   fetchLastplayed(key, uid) {
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
-      console.warn("请求超时，自动返回 null");
-      resolve(null);
-    }, 5000)
+        console.warn("请求超时，自动返回 null");
+        resolve(null);
+        }, 5000)
       const url = `https://osu.ppy.sh/api/get_user_best?k=${key}&u=${uid}&m=${fetchGameMode}&limit=1&type=id`;
       console.log('正在请求最近游玩: ' + url);
       fetch.fetch({
@@ -185,9 +190,16 @@ var fetchGameMode='1'
       })
     })
   },
-
+  onInit(){
+    this.needRefresh = true;
+  },
   //主逻辑控制
   async onShow() {
+    console.log("index refresh status: "+this.needRefresh)
+    if(this.needRefresh == false) {
+      console.log("no updates,skip refresh")
+      return;
+    }
     console.log('--- 开始加载用户信息 ---');
     //并行读取两个存储项
     const [storedKey, storedUID, gameMode, cardConfig] = await Promise.all([
@@ -251,18 +263,19 @@ var fetchGameMode='1'
       this.userPP = parseFloat(userData.pp_raw).toFixed(2); // 取整
       this.userAccuracy = parseFloat(userData.accuracy).toFixed(2); // 保留两位小数
       this.userPlaycount = userData.playcount;
-
       try{
         const lastPlayInfo = await this.fetchLastplayed(osuKey, userID);
         if(lastPlayInfo && lastPlayInfo.beatmap_id){
           const lastBeatmapDetail = await this.fetchBeatmapInfo(osuKey, lastPlayInfo.beatmap_id);
           this.recentBeatmapID = lastPlayInfo.beatmap_id;
           this.recentBestScore = lastPlayInfo.score;
+          this.canViewDetail = true;
           this.lastPlayedBeatmapName = lastBeatmapDetail ? lastBeatmapDetail.title : '未知谱面';
         }
           else{
             this.recentBeatmapID = '';
             this.lastPlayedBeatmapName = '无记录';
+            this.recentBestScore = 0;
         }
     }catch (e) {
         console.error('获取游玩记录失败', e);
@@ -279,7 +292,7 @@ var fetchGameMode='1'
 
   routeDetail(reqSongId){
     router.push({
-      uri: '/detail',
+      uri: '/pages/detail',
       params: {
       songID: reqSongId
       }

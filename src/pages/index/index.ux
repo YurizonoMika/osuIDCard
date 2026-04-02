@@ -188,7 +188,7 @@ var fetchGameMode='1'
   },
   //主逻辑控制
   async onShow() {
-    console.log('--- 开始加载用户信息 ---');
+    console.log('--- 加载用户信息 ---');
     //并行读取两个存储项
     const [storedKey, storedUID, gameMode, cardConfig] = await Promise.all([
       this.getStorage('osuKeyStoraged'),
@@ -237,7 +237,7 @@ var fetchGameMode='1'
 
     //获取网络数据
     const userData = await this.fetchAccount(osuKey, userID);
-    
+
 
     if (userData) {
       console.log('成功获取用户:', userData.username);

@@ -2,43 +2,78 @@
   <div class="demo-page">
     <div class="banner">
       <text class="goBackBtn" onclick="routeHome">←</text>
-      <text class="title" >编辑页面</text>
+      <text class="title">编辑页面</text>
     </div>
 
-    <div style="height:20px"></div>
+    <div style="height: 20px"></div>
 
     <div class="menu">
       <text class="subTitle">编辑卡片</text>
       <text class="tipsText">点击对应选项显隐卡片</text>
       <div>
-        <input class="btn leftBtn {{displayConfig[0] === 1?'selected':''}}" type="button" value="全球排名"
-          onclick="changeDisplayMode(0)"/>
-        <input class="btn rightBtn {{displayConfig[1] === 1?'selected':''}}" type="button" value="当前 PP"
-          onclick="changeDisplayMode(1)"/>
+        <input
+          class="btn leftBtn {{ displayConfig[0] === 1?'selected':'' }}"
+          type="button"
+          value="全球排名"
+          onclick="changeDisplayMode(0)"
+        />
+        <input
+          class="btn rightBtn {{ displayConfig[1] === 1?'selected':'' }}"
+          type="button"
+          value="当前 PP"
+          onclick="changeDisplayMode(1)"
+        />
       </div>
       <div>
-        <input class="btn leftBtn {{displayConfig[2] === 1?'selected':''}}" type="button" value="准确率"
-          onclick="changeDisplayMode(2)"/>
-        <input class="btn rightBtn {{displayConfig[3] === 1?'selected':''}}" type="button" value="游玩次数"
-          onclick="changeDisplayMode(3)"/>
+        <input
+          class="btn leftBtn {{ displayConfig[2] === 1?'selected':'' }}"
+          type="button"
+          value="准确率"
+          onclick="changeDisplayMode(2)"
+        />
+        <input
+          class="btn rightBtn {{ displayConfig[3] === 1?'selected':'' }}"
+          type="button"
+          value="游玩次数"
+          onclick="changeDisplayMode(3)"
+        />
       </div>
     </div>
 
-    <div style="height:20px"></div>
+    <div style="height: 20px"></div>
     <div class="menu">
       <text class="subTitle">游戏模式</text>
       <text class="tipsText">选择你要显示的游戏模式的数据</text>
-        <div>
-          <input class="btn leftBtn {{currMode === '0'?'selected':''}}" type="button" value="osu!" onclick="setAppMode('0')" />
-          <input class="btn rightBtn {{currMode === '1'?'selected':''}}" type="button" value="taiko" onclick="setAppMode('1')" />
-        </div>
-        <div>
-          <input class="btn leftBtn {{currMode === '2'?'selected':''}}" type="button" value="catch" onclick="setAppMode('2')" />
-          <input class="btn rightBtn {{currMode === '3'?'selected':''}}" type="button" value="mania" onclick="setAppMode('3')" />
-        </div>
+      <div>
+        <input
+          class="btn leftBtn {{ currMode === '0'?'selected':'' }}"
+          type="button"
+          value="osu!"
+          onclick="setAppMode('0')"
+        />
+        <input
+          class="btn rightBtn {{ currMode === '1'?'selected':'' }}"
+          type="button"
+          value="taiko"
+          onclick="setAppMode('1')"
+        />
+      </div>
+      <div>
+        <input
+          class="btn leftBtn {{ currMode === '2'?'selected':'' }}"
+          type="button"
+          value="catch"
+          onclick="setAppMode('2')"
+        />
+        <input
+          class="btn rightBtn {{ currMode === '3'?'selected':'' }}"
+          type="button"
+          value="mania"
+          onclick="setAppMode('3')"
+        />
+      </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -46,112 +81,112 @@ import router from "@system.router"
 import prompt from "@system.prompt"
 import storage from "@system.storage"
 export default {
-  private:{
-    currMode: '-1',
-    displayConfig: [0,0,0,0],
+  private: {
+    currMode: "-1",
+    displayConfig: [0, 0, 0, 0]
   },
-  onShow(){
-  storage.get({
-    //获取当前模式信息
-    key: 'osuMode',
-    success: (data) => {
-      this.currMode=data
-      console.log('读取到模式属性 mode=' + this.currMode)
-    },
-    fail: function(data, code) {
-      console.log(`未读取到模式属性 ${code}`)
-    }
-  });
-  //获取卡片显隐配置
-  storage.get({
-    key: 'cardConfig',
-    success: (data) => {
-      if (data) {
-        // 注意：storage 存取的是字符串，需要转回数组
-        this.displayConfig = JSON.parse(data);
+  onShow() {
+    storage.get({
+      //获取当前模式信息
+      key: "osuMode",
+      success: (data) => {
+        this.currMode = data
+        console.log("读取到模式属性 mode=" + this.currMode)
+      },
+      fail: function (data, code) {
+        console.log(`未读取到模式属性 ${code}`)
+      }
+    })
+    //获取卡片显隐配置
+    storage.get({
+      key: "cardConfig",
+      success: (data) => {
+        if (data) {
+          // 注意：storage 存取的是字符串，需要转回数组
+          this.displayConfig = JSON.parse(data)
         }
       }
-    });
-  },
-  setAppMode(mode){
-    storage.set({
-    key: 'osuMode',
-    value: mode,
-    success: (data) => {
-      this.currMode = mode;
-      if(mode==='0') prompt.showToast({message:'已设置为osu!standard模式'});
-      if(mode==='1') prompt.showToast({message:'已设置为osu!Taiko模式'});
-      if(mode==='2') prompt.showToast({message:'已设置为osu!catch模式'});
-      if(mode==='3') prompt.showToast({message:'已设置为osu!mania模式'});
-   },
-    fail: function(data, code) {
-      prompt.showToast({message:`发生未知错误：${code}`})
-    }
-})
-  },
-  changeDisplayMode(cardId){
-  // 1. 切换状态 (0 -> 1, 1 -> 0)
-  const newState = this.displayConfig[cardId] === 1 ? 0 : 1;
-  // 2. 更新数组 (使用 splice 确保触发视图刷新)
-  this.displayConfig.splice(cardId, 1, newState);
-  // 3. 保存到本地
-  storage.set({
-    key: 'cardConfig',
-    value: JSON.stringify(this.displayConfig), // 数组存入前需转成 JSON 字符串
-    success: () => {
-      console.log('配置已保存');
-    }
-  });
-  },
-  routeHome(){
-    console.log("refresh status: "+this.refreshIndex)
-    router.back({
-      uri:"/pages/index",
     })
   },
+  setAppMode(mode) {
+    storage.set({
+      key: "osuMode",
+      value: mode,
+      success: (data) => {
+        this.currMode = mode
+        if (mode === "0") prompt.showToast({message: "已设置为osu!standard模式"})
+        if (mode === "1") prompt.showToast({message: "已设置为osu!Taiko模式"})
+        if (mode === "2") prompt.showToast({message: "已设置为osu!catch模式"})
+        if (mode === "3") prompt.showToast({message: "已设置为osu!mania模式"})
+      },
+      fail: function (data, code) {
+        prompt.showToast({message: `发生未知错误：${code}`})
+      }
+    })
+  },
+  changeDisplayMode(cardId) {
+    // 1. 切换状态 (0 -> 1, 1 -> 0)
+    const newState = this.displayConfig[cardId] === 1 ? 0 : 1
+    // 2. 更新数组 (使用 splice 确保触发视图刷新)
+    this.displayConfig.splice(cardId, 1, newState)
+    // 3. 保存到本地
+    storage.set({
+      key: "cardConfig",
+      value: JSON.stringify(this.displayConfig), // 数组存入前需转成 JSON 字符串
+      success: () => {
+        console.log("配置已保存")
+      }
+    })
+  },
+  routeHome() {
+    console.log("refresh status: " + this.refreshIndex)
+    router.back({
+      uri: "/pages/index"
+    })
+  }
 }
 </script>
 
 <style>
-.menu{
-  display:flex;
+.menu {
+  display: flex;
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  padding-left:30px;
-  padding-right:30px;
-  width:100%
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
-.banner{
+.banner {
   display: flex;
   align-items: center;
-  padding-left:30px;
-  padding-top:30px;
-  padding-right:30px; 
-  width:100%;
+  padding-left: 30px;
+  padding-top: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
 .demo-page {
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:flex-start;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding-bottom: 50px;
 }
 
 .title {
-  color:white;
+  color: white;
   font-size: 50px;
   text-align: center;
-  font-weight:bold;
+  font-weight: bold;
 }
 .subTitle {
-  color:white;
+  color: white;
   font-size: 35px;
   text-align: center;
-  font-weight:bold;
+  font-weight: bold;
 }
-.tipsText{
-  color:#cccccc;
-  font-size:25px;
+.tipsText {
+  color: #cccccc;
+  font-size: 25px;
 }
 .btn {
   width: 50%;
@@ -163,7 +198,7 @@ export default {
   color: #ffffff;
 }
 .goBackBtn {
-  margin-right:10px;
+  margin-right: 10px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -175,12 +210,12 @@ export default {
   line-height: 40px;
 }
 .selected {
-  background-color:royalblue;
+  background-color: royalblue;
 }
-.leftBtn{
-  margin-right:2.5%;
+.leftBtn {
+  margin-right: 2.5%;
 }
-.rightBtn{
-  margin-left:2.5%;
+.rightBtn {
+  margin-left: 2.5%;
 }
 </style>

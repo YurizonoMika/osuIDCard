@@ -10,48 +10,52 @@
     </div>
     <div class="content">
       <text class="defaultText">腕上OSU身份卡</text>
-      <text class="defaultText">软件版本 {{appVer}}</text>
+      <text class="defaultText">软件版本 {{ appVer }}</text>
       <text></text>
       <text class="defaultText indent">在GitHub上查看我们的项目，和获取关于本App的使用方法。</text>
       <text></text>
       <text class="defaultText">GitHub:YurizonoMika/osu-idcard</text>
       <text></text>
-      <text class="defaultText indent">要获取更多信息与帮助，请联系邮箱：the_sly_fox@foxmail.com</text>
+      <text class="defaultText indent">
+        要获取更多信息与帮助，请联系邮箱：the_sly_fox@foxmail.com
+      </text>
       <text></text>
-      <text class="defaultText indent">App内嵌输入法是来自开发者 NEORUAA 的开源组件，要查看详细信息，请转到GitHub：NEORUAA/Vela_input_method</text>
+      <text class="defaultText indent">
+        App内嵌输入法是来自开发者 NEORUAA
+        的开源组件，要查看详细信息，请转到GitHub：NEORUAA/Vela_input_method
+      </text>
     </div>
     <div class="menu">
-      <input class="btn" type="button" value="检查更新" onclick="checkUpdate"/>
+      <input class="btn" type="button" value="检查更新" onclick="checkUpdate" />
     </div>
   </div>
-
 </template>
 
 <script>
 import router from "@system.router"
 import app from "@system.app"
 import prompt from "@system.prompt"
-var appInfo;
-var codeName;
+var appInfo
+var codeName
 export default {
-  private:{
-    appVer:codeName
+  private: {
+    appVer: codeName
   },
-  onShow(){
+  onShow() {
     try {
       // 2. 获取应用信息
-      const info = app.getInfo();
-      
+      const info = app.getInfo()
+
       // 3. 兼容性处理：有的平台返回字符串，有的返回对象
-      const appInfo = (typeof info === 'string') ? JSON.parse(info) : info;
-      
+      const appInfo = typeof info === "string" ? JSON.parse(info) : info
+
       // 4. 【关键】使用 this.appVer 赋值，这样界面才会响应式更新
-      this.appVer = appInfo.versionName;
-      
-      console.log("当前版本:", this.appVer);
+      this.appVer = appInfo.versionName
+
+      console.log("当前版本:", this.appVer)
     } catch (e) {
-      console.error("获取版本失败", e);
-      this.appVer = "未知版本";
+      console.error("获取版本失败", e)
+      this.appVer = "未知版本"
     }
   },
   exit() {
@@ -59,38 +63,36 @@ export default {
       uri: "/pages/config"
     })
   },
-  checkUpdate(){
-    prompt.showToast({message:"暂不支持"})
+  checkUpdate() {
+    prompt.showToast({message: "暂不支持"})
     console.log(codeName)
   }
-
-  }
+}
 </script>
 
 <style>
-.defaultText{
-  color:#999999;
+.defaultText {
+  color: #999999;
   font-size: 25px;
   text-align: left;
-  font-weight:bold;
+  font-weight: bold;
 }
-.menu{
-  display:flex;
+.menu {
+  display: flex;
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  padding-left:30px;
-  padding-right:30px;
-  width:100%
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
 
 .demo-page {
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:center;
+  justify-content: flex-start;
+  align-items: center;
   padding-bottom: 50px;
 }
-
 
 .indent {
   text-indent: 0px; /* 缩进两个字符单位 */
@@ -105,32 +107,31 @@ export default {
   color: #ffffff;
 }
 .title {
-
-  color:white;
+  color: white;
   font-size: 50px;
   text-align: center;
-  font-weight:bold;
+  font-weight: bold;
 }
-.content{
+.content {
   flex-direction: column;
   display: flex;
   align-items: center;
-  padding-left:30px;
-  padding-top:30px;
-  padding-right:30px; 
-  width:100%;
+  padding-left: 30px;
+  padding-top: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
-.banner{
+.banner {
   display: flex;
   align-items: center;
-  padding-left:30px;
-  padding-top:30px;
-  padding-right:30px; 
-  width:100%;
+  padding-left: 30px;
+  padding-top: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
 /* 返回按钮样式 */
 .goBackBtn {
-  margin-right:10px;
+  margin-right: 10px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -141,12 +142,11 @@ export default {
   color: #cccccc;
   line-height: 40px;
 }
-.imageContainer{
-  display:flex;
+.imageContainer {
+  display: flex;
   flex-direction: column;
-  justify-content:center;
-  align-items:center;
+  justify-content: center;
+  align-items: center;
   padding-top: 15px;
 }
 </style>
-

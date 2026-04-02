@@ -9,11 +9,10 @@
       <text></text>
     </div>
     <div class="menu">
-      <input class="btn" type="button" value="是的，我确定" onclick="delUser" style="color:red"/>
+      <input class="btn" type="button" value="是的，我确定" onclick="delUser" style="color: red" />
       <input class="btn" type="button" value="不，请不要这么做" onclick="exit" />
     </div>
   </div>
-
 </template>
 
 <script>
@@ -26,74 +25,70 @@ export default {
       uri: "/pages/config"
     })
   },
- async delUser(){
-  const removeStorage = (key) => {
+  async delUser() {
+    const removeStorage = (key) => {
       return new Promise((resolve) => {
         storage.delete({
           key: key,
           success: () => {
-            console.log(`已清除: ${key}`);
-            resolve(true);
+            console.log(`已清除: ${key}`)
+            resolve(true)
           },
           fail: (data, code) => {
-            console.log(`清除 ${key} 失败: ${code}`);
-            resolve(false); // 即使失败也 resolve，避免 Promise.all 挂起
+            console.log(`清除 ${key} 失败: ${code}`)
+            resolve(false) // 即使失败也 resolve，避免 Promise.all 挂起
           }
-        });
-      });
-    };
+        })
+      })
+    }
 
     //执行删除操作
-    await Promise.all([
-      removeStorage('osuKeyStoraged'),
-      removeStorage('osuUIDStoraged')
-    ]);
+    await Promise.all([removeStorage("osuKeyStoraged"), removeStorage("osuUIDStoraged")])
 
-    prompt.showToast({message: '配置已清空'});
-    this.exit();
-    this.$app.exit();
+    prompt.showToast({message: "配置已清空"})
+    this.exit()
+    this.$app.exit()
   }
-
-  }
+}
 </script>
 
 <style>
-.defaultText{
-  color:gold;
+.defaultText {
+  color: gold;
   font-size: 25px;
   text-align: left;
-  font-weight:bold;
+  font-weight: bold;
 }
-.menu{
-  display:flex;
+.menu {
+  display: flex;
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  padding-left:30px;
-  padding-right:30px;
-  width:100%
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
-.banner{
+.banner {
   flex-direction: column;
   display: flex;
   align-items: center;
-  padding-left:30px;
-  padding-top:30px;
-  padding-right:30px; 
-  width:100%;
+  padding-left: 30px;
+  padding-top: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
 .demo-page {
   padding-top: 30px;
   flex-direction: column;
-  justify-content:center;
-  align-items:center;
+  justify-content: center;
+  align-items: center;
 }
 
 .title {
-  color:white;
+  color: white;
   font-size: 40px;
   text-align: center;
-  font-weight:bold;
+  font-weight: bold;
 }
 
 .btn {

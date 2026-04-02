@@ -1,48 +1,58 @@
 <import name="input-method" src="../../components/InputMethod/InputMethod.ux"></import>
 <template>
   <div class="demo-page">
-    <div class="demo-page" style="top:10px">
-    <text class="title">绑定API Key</text>
-    <text style="font-size:10px"></text>
-    <div class="input_container" style="border-color: {{boxBorder}}" @click="changeState">    
-      <text class="input_text">
-      {{textValue}}
-      </text>
+    <div class="demo-page" style="top: 10px">
+      <text class="title">绑定API Key</text>
+      <text style="font-size: 10px"></text>
+      <div class="input_container" style="border-color: {{ boxBorder }}" @click="changeState">
+        <text class="input_text">
+          {{ textValue }}
+        </text>
+      </div>
+      <div>
+        <input class="btn" type="button" value="返回" onclick="exitLogin" />
+        <input
+          class="btn"
+          type="button"
+          value="保存密钥"
+          onclick="saveOAuthKey"
+          style="width: 130px"
+        />
+        <input
+          class="btn"
+          type="button"
+          value="验证密钥"
+          onclick="testOAuthKey"
+          style="width: 130px"
+        />
+      </div>
     </div>
-    <div>
-    <input class="btn" type="button" value="返回" onclick="exitLogin"/>
-    <input class="btn" type="button" value="保存密钥" onclick="saveOAuthKey" style="width:130px"/>
-    <input class="btn" type="button" value="验证密钥" onclick="testOAuthKey" style="width:130px"/>
-    </div>
-  </div>
     <input-method
-      hide="{{hide}}"
-      keyboardtype="{{keyboardtype}}"
+      hide="{{ hide }}"
+      keyboardtype="{{ keyboardtype }}"
       maxlength="5"
-      vibratemode="{{vibratemode}}"
-      screentype="{{screentype}}"
+      vibratemode="{{ vibratemode }}"
+      screentype="{{ screentype }}"
       @visibility-change="onVisibilityChange"
       @key-down="onKeyDown"
       @delete="onDelete"
       @complete="onComplete"
     ></input-method>
   </div>
-  
 </template>
 
 <script>
-import prompt from '@system.prompt'
-import route from '@system.router'
-import storage from '@system.storage'
-import fetch from '@system.fetch'
-var boxBorderStatus="aliceblue"
-var keyValue=null
-var userToken=undefined
-
+import prompt from "@system.prompt"
+import route from "@system.router"
+import storage from "@system.storage"
+import fetch from "@system.fetch"
+var boxBorderStatus = "aliceblue"
+var keyValue = null
+var userToken = undefined
 
 export default {
   private: {
-    defaultText:"点击输入API Key",
+    defaultText: "点击输入API Key",
     textValue: "",
     hide: true,
     keyboardtype: "QWERTY", //QWERTY, T9
@@ -50,111 +60,109 @@ export default {
     screentype: "rect", //pill-shaped, rect, circle
     boxBorder: boxBorderStatus
   },
-  exitLogin(){
-    route.back({uri:'pages/index'})
+  exitLogin() {
+    route.back({uri: "pages/index"})
   },
-  saveOAuthKey(){
-    keyValue=this.textValue;
-    if(keyValue==this.defaultText) keyValue=undefined;
-    if(keyValue==undefined||keyValue==''){
-      prompt.showToast({message:'密钥为空'});
-      this.boxBorder="red";
-      return;
+  saveOAuthKey() {
+    keyValue = this.textValue
+    if (keyValue == this.defaultText) keyValue = undefined
+    if (keyValue == undefined || keyValue == "") {
+      prompt.showToast({message: "密钥为空"})
+      this.boxBorder = "red"
+      return
     }
-    console.log("Will write your key to storage");
+    console.log("Will write your key to storage")
     storage.set({
-      key:'osuKeyStoraged',
-      value:keyValue,
-      success:function(){
-        prompt.showToast({message:'已保存'})
-        console.log("Key written!");
+      key: "osuKeyStoraged",
+      value: keyValue,
+      success: function () {
+        prompt.showToast({message: "已保存"})
+        console.log("Key written!")
       },
-      fail:function(){
-        prompt.showToast({message:'保存失败，请重试'});
+      fail: function () {
+        prompt.showToast({message: "保存失败，请重试"})
       }
     })
-    
   },
-  testOAuthKey(){
-    var url = 'https://osu.ppy.sh/api/get_user?k=' + this.textValue + '&u=35020720&type=id';
+  testOAuthKey() {
+    var url = "https://osu.ppy.sh/api/get_user?k=" + this.textValue + "&u=35020720&type=id"
     fetch.fetch({
-    url: url,
-    method: 'GET',
-    success: function(ret) {
+      url: url,
+      method: "GET",
+      success: function (ret) {
         try {
-            let data;
-            if (typeof ret.data === 'object') {
-                data = ret.data;
-            } else {
-                data = JSON.parse(ret.data);
-            }
-            if (data && data.length > 0) {
-                const user = data[0];
-                console.log('成功获取数据');
-                prompt.showToast({message:'API密钥可用'})
-            } else {
-                console.log('未找到用户，请检查您的API Key是否可用');
-                prompt.showToast({message:'API Key验证失败'})
-            }
+          let data
+          if (typeof ret.data === "object") {
+            data = ret.data
+          } else {
+            data = JSON.parse(ret.data)
+          }
+          if (data && data.length > 0) {
+            const user = data[0]
+            console.log("成功获取数据")
+            prompt.showToast({message: "API密钥可用"})
+          } else {
+            console.log("未找到用户，请检查您的API Key是否可用")
+            prompt.showToast({message: "API Key验证失败"})
+          }
         } catch (e) {
-            console.log('解析逻辑崩溃: ' + e.message);
+          console.log("解析逻辑崩溃: " + e.message)
         }
-    },
-    fail: function(msg, code) {
-        console.log('网络请求失败: ' + msg);
-    }
-    });
+      },
+      fail: function (msg, code) {
+        console.log("网络请求失败: " + msg)
+      }
+    })
   },
-  onInit(){
-    this.textValue=this.defaultText;
+  onInit() {
+    this.textValue = this.defaultText
   },
   onVisibilityChange(evt) {
-    console.log("显示状态变更:"+JSON.stringify(evt));
+    console.log("显示状态变更:" + JSON.stringify(evt))
   },
   onKeyDown(evt) {
-    if(this.textValue.length==40){
-      this.boxBorder="red";
-      prompt.showToast({message:'授权码长度最大为40'});
+    if (this.textValue.length == 40) {
+      this.boxBorder = "red"
+      prompt.showToast({message: "授权码长度最大为40"})
     }
-    if(this.textValue.length<40){
-      this.boxBorder="aliceblue";
+    if (this.textValue.length < 40) {
+      this.boxBorder = "aliceblue"
     }
-    console.log("按下按键:"+JSON.stringify(evt));
+    console.log("按下按键:" + JSON.stringify(evt))
   },
   onDelete() {
-    this.textValue = this.textValue.slice(0, -1);
-    if(this.textValue.length<40){
-      this.boxBorder="aliceblue";
+    this.textValue = this.textValue.slice(0, -1)
+    if (this.textValue.length < 40) {
+      this.boxBorder = "aliceblue"
     }
-    console.log("删除字符");
+    console.log("删除字符")
   },
   changeState() {
-    this.hide = !this.hide;
-    if(this.textValue==this.defaultText){
-      this.textValue="";
+    this.hide = !this.hide
+    if (this.textValue == this.defaultText) {
+      this.textValue = ""
     }
-
   },
   onComplete(evt) {
-    if(this.textValue.length==40){
-      return;
+    if (this.textValue.length == 40) {
+      return
     }
-    this.textValue += evt.detail.content;
-    console.log("返回字符:"+JSON.stringify(evt));
-  },
+    this.textValue += evt.detail.content
+    console.log("返回字符:" + JSON.stringify(evt))
+  }
 }
 </script>
 
 <style>
-.input_text{
+.input_text {
   font-size: 25px;
-  margin-left:10px;
+  margin-left: 10px;
   margin-right: 10px;
-  color:#EEEEEE
+  color: #eeeeee;
 }
 .demo-page {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -170,21 +178,21 @@ export default {
   border-radius: 20px;
   background-color: #333333;
   font-size: 25px;
-  color: #EEEEEE;
+  color: #eeeeee;
   align-self: flex-start;
 }
 .title {
   font-weight: bold;
   align-self: flex-start;
-  color:white;
+  color: white;
   font-size: 35px;
 }
-.input_container{
+.input_container {
   height: 25%;
   width: 90%;
-  border-radius:30px;
-  border-style:solid;
+  border-radius: 30px;
+  border-style: solid;
   border-width: 3px;
-  background-color:#5A5A5A;
+  background-color: #5a5a5a;
 }
 </style>

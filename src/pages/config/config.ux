@@ -2,24 +2,29 @@
   <div class="demo-page">
     <div class="banner">
       <text class="goBackBtn" onclick="routeHome">←</text>
-      <text class="title" >设置</text>
+      <text class="title">设置</text>
     </div>
     <div class="menu">
       <input class="btn" type="button" value="帮助与支持" onclick="routeInfo" />
       <input class="btn" type="button" value="配置API Key" onclick="routeSign" />
       <input class="btn" type="button" value="绑定UID" onclick="routeBind" />
-      <input class="btn" type="button" value="删除用户信息" onclick="routeRemove" style="color:red" />
+      <input
+        class="btn"
+        type="button"
+        value="删除用户信息"
+        onclick="routeRemove"
+        style="color: red"
+      />
     </div>
   </div>
-
 </template>
 
 <script>
 import router from "@system.router"
 export default {
-  routeRemove(){
+  routeRemove() {
     router.push({
-      uri:"pages/remove"
+      uri: "pages/remove"
     })
   },
   routeSign() {
@@ -27,14 +32,14 @@ export default {
       uri: "/pages/sign"
     })
   },
-  routeHome(){
+  routeHome() {
     router.back({
-      uri:"/pages/index"
+      uri: "/pages/index"
     })
   },
-  routeInfo(){
+  routeInfo() {
     router.push({
-      uri:"/pages/version"
+      uri: "/pages/version"
     })
   },
   routeBind() {
@@ -46,34 +51,34 @@ export default {
 </script>
 
 <style>
-.menu{
-  display:flex;
+.menu {
+  display: flex;
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  padding-left:30px;
-  padding-right:30px;
-  width:100%
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
-.banner{
+.banner {
   display: flex;
   align-items: center;
-  padding-left:30px;
-  padding-top:30px;
-  padding-right:30px; 
-  width:100%;
+  padding-left: 30px;
+  padding-top: 30px;
+  padding-right: 30px;
+  width: 100%;
 }
 .demo-page {
   flex-direction: column;
-  justify-content:flex-start;
-  align-items:flex-start;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .title {
-  color:white;
+  color: white;
   font-size: 50px;
   text-align: center;
-  font-weight:bold;
+  font-weight: bold;
 }
 
 .btn {
@@ -86,7 +91,7 @@ export default {
   color: #ffffff;
 }
 .goBackBtn {
-  margin-right:10px;
+  margin-right: 10px;
   width: 50px;
   height: 50px;
   border-radius: 50%;

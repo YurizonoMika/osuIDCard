@@ -1,26 +1,26 @@
 <import name="input-method" src="../../components/InputMethod/InputMethod.ux"></import>
 <template>
   <div class="demo-page">
-    <div class="demo-page" style="top:10px">
-    <text class="title">绑定您的UID</text>
-    <text style="font-size:10px"></text>
-    <div class="input_container" style="border-color: {{boxBorder}}" @click="changeState">    
-      <text class="input_text">
-      {{textValue}}
-      </text>
+    <div class="demo-page" style="top: 10px">
+      <text class="title">绑定您的UID</text>
+      <text style="font-size: 10px"></text>
+      <div class="input_container" style="border-color: {{ boxBorder }}" @click="changeState">
+        <text class="input_text">
+          {{ textValue }}
+        </text>
+      </div>
+      <div>
+        <input class="btn" type="button" value="返回" onclick="exitLogin" />
+        <input class="btn" type="button" value="保存UID" onclick="saveUID" style="width: 130px" />
+        <input class="btn" type="button" value="查找用户" onclick="testUID" style="width: 130px" />
+      </div>
     </div>
-    <div>
-    <input class="btn" type="button" value="返回" onclick="exitLogin"/>
-    <input class="btn" type="button" value="保存UID" onclick="saveUID" style="width:130px"/>
-    <input class="btn" type="button" value="查找用户" onclick="testUID" style="width:130px"/>
-    </div>
-  </div>
     <input-method
-      hide="{{hide}}"
-      keyboardtype="{{keyboardtype}}"
+      hide="{{ hide }}"
+      keyboardtype="{{ keyboardtype }}"
       maxlength="5"
-      vibratemode="{{vibratemode}}"
-      screentype="{{screentype}}"
+      vibratemode="{{ vibratemode }}"
+      screentype="{{ screentype }}"
       @visibility-change="onVisibilityChange"
       @key-down="onKeyDown"
       @delete="onDelete"
@@ -30,155 +30,153 @@
 </template>
 
 <script>
-import prompt from '@system.prompt'
-import route from '@system.router'
-import storage from '@system.storage'
-import fetch from '@system.fetch'
-var boxBorderStatus="aliceblue"
-var keyValue=undefined
-var userToken=undefined
-var osuKey=''
+import prompt from "@system.prompt"
+import route from "@system.router"
+import storage from "@system.storage"
+import fetch from "@system.fetch"
+var boxBorderStatus = "aliceblue"
+var keyValue = undefined
+var userToken = undefined
+var osuKey = ""
 
 export default {
   private: {
-    defaultText:'点击此处输入UID',
-    textValue: '',
+    defaultText: "点击此处输入UID",
+    textValue: "",
     hide: true,
     keyboardtype: "QWERTY", //QWERTY, T9
     vibratemode: "short",
     screentype: "rect", //pill-shaped, rect, circle
     boxBorder: boxBorderStatus
   },
-  onDestroy(){
-    osuKey=null;
-    global.runGC();
+  onDestroy() {
+    osuKey = null
+    global.runGC()
   },
-  onShow(){
-    global.runGC();
+  onShow() {
+    global.runGC()
     storage.get({
-      key: 'osuKeyStoraged',
-      success: (data) => { 
-        console.log('Get osu Account Passkey Success');
-        if (data) { // storage.get 成功获取到数据
-          osuKey = data;
-          console.log("Detected osu Key, Your Key is: " + this.osuKey);
-          getAPIFlag=true;
+      key: "osuKeyStoraged",
+      success: (data) => {
+        console.log("Get osu Account Passkey Success")
+        if (data) {
+          // storage.get 成功获取到数据
+          osuKey = data
+          console.log("Detected osu Key, Your Key is: " + this.osuKey)
+          getAPIFlag = true
         } else {
-          prompt.showToast({message:'获取API Key失败，请先配置API Key'});
-          console.log("No osu Key");
-          getAPIFlag=false;
-       }
+          prompt.showToast({message: "获取API Key失败，请先配置API Key"})
+          console.log("No osu Key")
+          getAPIFlag = false
+        }
       },
       fail: (data) => {
-        getAPIFlag = false;
-        console.log(`Get osu Passkey Failed`);
-     }
-    });
-  },
-  exitLogin(){
-    route.back({uri:'pages/index'})
-  },
-  saveUID(){
-    keyValue=this.textValue;
-    if(keyValue==this.defaultText) keyValue=undefined;
-    if(keyValue==undefined||keyValue==''){
-      prompt.showToast({message:'UID为空'});
-      this.boxBorder="red";
-      return;
-    }
-    console.log("Will write your UID to storage");
-    storage.set({
-      key:'osuUIDStoraged',
-      value:keyValue,
-      success:function(){
-        prompt.showToast({message:'UID已保存'})
-        console.log("Key written!");
-      },
-      fail:function(){
-        prompt.showToast({message:'保存失败，请重试'});
+        getAPIFlag = false
+        console.log(`Get osu Passkey Failed`)
       }
     })
-    
   },
-  testUID(){
-    var url = 'https://osu.ppy.sh/api/get_user?k=' + osuKey + '&u=' + this.textValue + '&type=id';
-    fetch.fetch({
-    url: url,
-    method: 'GET',
-    success: function(ret) {
-        try {
-            let data;
-            if (typeof ret.data === 'object') {
-                data = ret.data;
-            } else {
-                data = JSON.parse(ret.data);
-            }
-            if (data && data.length > 0) {
-                const user = data[0];
-                console.log('--- 成功获取数据 ---');
-                console.log('用户名: ' + user.username);
-                console.log('当前PP: ' + user.pp_raw);
-                console.log('全球排名: ' + user.pp_rank);
-                prompt.showToast({message:'用户存在'})
-            } else {
-                console.log('未找到用户，请检查 UID 或 API Key');
-            }
-        } catch (e) {
-            console.log('解析逻辑崩溃: ' + e.message);
-        }
-    },
-    fail: function(msg, code) {
-        console.log('网络请求失败: ' + msg);
+  exitLogin() {
+    route.back({uri: "pages/index"})
+  },
+  saveUID() {
+    keyValue = this.textValue
+    if (keyValue == this.defaultText) keyValue = undefined
+    if (keyValue == undefined || keyValue == "") {
+      prompt.showToast({message: "UID为空"})
+      this.boxBorder = "red"
+      return
     }
-    });
+    console.log("Will write your UID to storage")
+    storage.set({
+      key: "osuUIDStoraged",
+      value: keyValue,
+      success: function () {
+        prompt.showToast({message: "UID已保存"})
+        console.log("Key written!")
+      },
+      fail: function () {
+        prompt.showToast({message: "保存失败，请重试"})
+      }
+    })
   },
-  onInit(){
-    this.textValue=this.defaultText;
+  testUID() {
+    var url = "https://osu.ppy.sh/api/get_user?k=" + osuKey + "&u=" + this.textValue + "&type=id"
+    fetch.fetch({
+      url: url,
+      method: "GET",
+      success: function (ret) {
+        try {
+          let data
+          if (typeof ret.data === "object") {
+            data = ret.data
+          } else {
+            data = JSON.parse(ret.data)
+          }
+          if (data && data.length > 0) {
+            const user = data[0]
+            console.log("--- 成功获取数据 ---")
+            console.log("用户名: " + user.username)
+            console.log("当前PP: " + user.pp_raw)
+            console.log("全球排名: " + user.pp_rank)
+            prompt.showToast({message: "用户存在"})
+          } else {
+            console.log("未找到用户，请检查 UID 或 API Key")
+          }
+        } catch (e) {
+          console.log("解析逻辑崩溃: " + e.message)
+        }
+      },
+      fail: function (msg, code) {
+        console.log("网络请求失败: " + msg)
+      }
+    })
+  },
+  onInit() {
+    this.textValue = this.defaultText
   },
   onVisibilityChange(evt) {
-    console.log("显示状态变更:"+JSON.stringify(evt));
+    console.log("显示状态变更:" + JSON.stringify(evt))
   },
   onKeyDown(evt) {
-    if(this.textValue.length==40){
-      this.boxBorder="red";
-      prompt.showToast({message:'UID长度最大为40'});
+    if (this.textValue.length == 40) {
+      this.boxBorder = "red"
+      prompt.showToast({message: "UID长度最大为40"})
     }
-    if(this.textValue.length<40){
-      this.boxBorder="aliceblue";
+    if (this.textValue.length < 40) {
+      this.boxBorder = "aliceblue"
     }
-    console.log("按下按键:"+JSON.stringify(evt));
+    console.log("按下按键:" + JSON.stringify(evt))
   },
   onDelete() {
-    this.textValue = this.textValue.slice(0, -1);
-    if(this.textValue.length<40){
-      this.boxBorder="aliceblue";
+    this.textValue = this.textValue.slice(0, -1)
+    if (this.textValue.length < 40) {
+      this.boxBorder = "aliceblue"
     }
-    console.log("删除字符");
+    console.log("删除字符")
   },
   changeState() {
-    this.hide = !this.hide;
-    if(this.textValue==this.defaultText){
-      this.textValue="";
+    this.hide = !this.hide
+    if (this.textValue == this.defaultText) {
+      this.textValue = ""
     }
-
   },
   onComplete(evt) {
-    if(this.textValue.length==40){
-      return;
+    if (this.textValue.length == 40) {
+      return
     }
-    this.textValue += evt.detail.content;
-    console.log("返回字符:"+JSON.stringify(evt));
-  },
+    this.textValue += evt.detail.content
+    console.log("返回字符:" + JSON.stringify(evt))
+  }
 }
 </script>
 
 <style>
-
-.input_text{
+.input_text {
   font-size: 25px;
-  margin-left:10px;
+  margin-left: 10px;
   margin-right: 10px;
-  color:#EEEEEE
+  color: #eeeeee;
 }
 .demo-page {
   height: 100%;
@@ -198,21 +196,21 @@ export default {
   border-radius: 20px;
   background-color: #333333;
   font-size: 25px;
-  color: #EEEEEE;
+  color: #eeeeee;
   align-self: flex-start;
 }
 .title {
   font-weight: bold;
   align-self: flex-start;
-  color:white;
+  color: white;
   font-size: 35px;
 }
-.input_container{
-  height:20%;
+.input_container {
+  height: 20%;
   width: 90%;
-  border-radius:30px;
-  border-style:solid;
+  border-radius: 30px;
+  border-style: solid;
   border-width: 3px;
-  background-color:#5A5A5A;
+  background-color: #5a5a5a;
 }
 </style>

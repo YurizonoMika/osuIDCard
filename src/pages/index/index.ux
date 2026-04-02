@@ -75,9 +75,6 @@ var lastBeatmapName = ''
 var fetchGameMode='1'
 
   export default {
-    public:{
-    needRefresh: true,
-  },
   private: {
     titleWelcomeInfo: '请登录',
     uid:'',
@@ -92,7 +89,6 @@ var fetchGameMode='1'
     displayConfig: [0, 0, 0, 0],
     modeText:'',
     canViewDetail: false,
-    needRefresh: null
   },
   onDestroy(){
     global.runGC();
@@ -190,16 +186,8 @@ var fetchGameMode='1'
       })
     })
   },
-  onInit(){
-    this.needRefresh = true;
-  },
   //主逻辑控制
   async onShow() {
-    console.log("index refresh status: "+this.needRefresh)
-    if(this.needRefresh == false) {
-      console.log("no updates,skip refresh")
-      return;
-    }
     console.log('--- 开始加载用户信息 ---');
     //并行读取两个存储项
     const [storedKey, storedUID, gameMode, cardConfig] = await Promise.all([

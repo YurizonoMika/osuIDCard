@@ -237,8 +237,6 @@ var fetchGameMode='1'
 
     if (userData) {
       console.log('成功获取用户:', userData.username);
-      prompt.showToast({ message: '登录成功' });
-      
       //必须通过 this 赋值给 private 里的变量，界面才会实时刷新
       this.showAvatar = true;
       this.titleWelcomeInfo = userData.username;

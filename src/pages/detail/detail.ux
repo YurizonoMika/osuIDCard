@@ -5,14 +5,123 @@
       <text class="title">歌曲信息</text>
     </div>
     <div class="menu">
-      <input class="btn" type="button" value="页面建设中" />
+      <div class="largeCard">
+        <div class="imageContainer">
+          <image
+            src="https://b.ppy.sh/thumb/{{ imageID }}l.jpg"
+            class="image"
+            object-fit="scale-down"
+          />
+        </div>
+        <div class="textContainer">
+          <text>###############</text>
+        </div>
+      </div>
+      <text style="color: white">成功获取存储数据</text>
+      <text style="color: white">
+        歌曲：{{ songID }} 用户：{{ uid }} 模式：{{ gameMode }} key：{{ apikey }}
+      </text>
+      <text style="color: white">
+        imageURL : https://assets.ppy.sh/beatmaps/{{ imageID }}/covers/cover.jpg
+      </text>
+      <text style="color: white">songInfoURL : {{ songURL }}</text>
     </div>
   </div>
 </template>
 
 <script>
 import router from "@system.router"
+import fetch from "@system.fetch"
 export default {
+  protected: {
+    songID: null,
+    gameMode: null,
+    uid: null,
+    apikey: null
+  },
+  private: {
+    imageID: null,
+    songURL: null
+  },
+
+  fetchBeatmapInfo(key, beatmap) {
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        console.warn("请求超时，自动返回 null")
+        resolve(null)
+      }, 5000)
+      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&b=${beatmap}&m=${this.gameMode}&limit=1&type=id`
+      console.log("正在请求谱面信息: " + url)
+      fetch.fetch({
+        url: url,
+        method: "GET",
+        success: (ret) => {
+          clearTimeout(timeout)
+          try {
+            let data = typeof ret.data === "object" ? ret.data : JSON.parse(ret.data)
+            console.log("接口原始返回:", data)
+            resolve(data && data.length > 0 ? data[0] : null)
+          } catch (e) {
+            resolve(null)
+          }
+        },
+        fail: () => {
+          resolve(null)
+          clearTimeout(timeout)
+        }
+      })
+    })
+  },
+
+  fetchBeatmaps(key, beatmap) {
+    console.log("开始获取歌曲信息")
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        console.warn("请求超时，自动返回 null")
+        resolve(null)
+      }, 5000)
+      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${key}&m=${this.gameMode}&b=${beatmap}`
+      this.songURL = url
+      console.log("调用链接：" + url)
+      fetch.fetch({
+        url: url,
+        method: "GET",
+        success: (ret) => {
+          console.log("解析完成")
+          clearTimeout(timeout)
+          try {
+            let data = typeof ret.data === "object" ? ret.data : JSON.parse(ret.data)
+            resolve(data && data.length > 0 ? data : null)
+          } catch (e) {
+            resolve(null)
+          }
+        },
+        fail: () => {
+          resolve(null)
+          console.log("解析出错")
+          clearTimeout(timeout)
+        }
+      })
+    })
+  },
+  async onShow() {
+    try {
+      console.log("调用歌曲解析方法")
+      const beatmapsInfo = await this.fetchBeatmaps(this.apikey, this.songID)
+      console.log("获取的JSON原始数据：" + beatmapsInfo)
+      console.log("传回图片ID")
+      this.imageID = beatmapsInfo[0].beatmapset_id
+      if (beatmapsInfo && beatmapsInfo.length > 0) {
+        const firstItem = beatmapsInfo[0]
+        this.imageID = firstItem.beatmapset_id
+        console.log("成功获取图片 ID:", this.imageID)
+      } else {
+        console.warn("未获取到谱面数组或数组为空")
+      }
+    } catch (err) {
+      console.error("onShow 执行出错:", err)
+    }
+  },
   routeHome() {
     router.back({
       uri: "/pages/index"
@@ -61,6 +170,27 @@ export default {
   font-size: 30px;
   color: #ffffff;
 }
+.largeCard {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 20px;
+  padding: 20%;
+  background-color: #222222;
+  font-size: 30px;
+  color: #ffffff;
+}
+.imageContainer {
+  width: 50%;
+  height: 100%;
+  border-radius: 20px;
+}
+.textContainer {
+  width: 45%;
+}
+.image {
+  border-radius: 20px;
+}
+
 .goBackBtn {
   margin-right: 10px;
   width: 50px;

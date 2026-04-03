@@ -42,7 +42,7 @@
         <div>
           <text class="cardLabel">最佳成绩</text>
           <div style="flex:1"></div>
-          <text class="cardLabel" onclick="routeDetail(recentBeatmapID)" if="{{canViewDetail == true}}"> 歌曲信息→ </text>
+          <text class="cardLabel" onclick="routeDetail(recentBeatmapID,mode,uid,key)" if="{{canViewDetail == true}}"> 歌曲信息→ </text>
         </div>
         <text class="cardValue" style="margin-bottom:10px;">{{lastPlayedBeatmapName}}</text>
         <text class="cardValue" style="font-size:20px;">ID：{{recentBeatmapID}}</text>
@@ -62,16 +62,8 @@ import router from "@system.router"
 import storage from "@system.storage"
 import prompt from "@system.prompt"
 import fetch from "@system.fetch"
-var logonStatus=false
 var osuKey=null
 var userID=null
-var signUpflag=false
-var getAPIFlag=false
-var getUIDFlag=false
-var currUserName=''
-var welcomeInfo=''
-var lastPlayedBeatmapID=''
-var lastBeatmapName = ''
 var fetchGameMode='1'
 
   export default {
@@ -89,6 +81,8 @@ var fetchGameMode='1'
     displayConfig: [0, 0, 0, 0],
     modeText:'',
     canViewDetail: false,
+    mode:null,
+    key:null,
   },
   onDestroy(){
     global.runGC();
@@ -217,6 +211,8 @@ var fetchGameMode='1'
     osuKey = storedKey;
     userID = storedUID;
     fetchGameMode=gameMode;
+    this.mode=gameMode;
+    this.key=osuKey;
 
     switch(gameMode){
       case '0':
@@ -278,11 +274,14 @@ var fetchGameMode='1'
     }
   },
 
-  routeDetail(reqSongId){
+  routeDetail(reqSongId,mode,user,apikey){
     router.push({
       uri: '/pages/detail',
       params: {
-      songID: reqSongId
+      songID: reqSongId,
+      gameMode: mode,
+      uid:user,
+      apikey:apikey
       }
     })
   },

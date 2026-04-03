@@ -14,10 +14,11 @@
           />
         </div>
         <div class="textContainer">
-          <text>###############</text>
+          <text class="subTitle">{{ songName }}</text>
+          <text class="defaultContent">{{ author }}</text>
         </div>
       </div>
-      <text style="color: white">成功获取存储数据</text>
+      <text style="color: white">开盒成功</text>
       <text style="color: white">
         歌曲：{{ songID }} 用户：{{ uid }} 模式：{{ gameMode }} key：{{ apikey }}
       </text>
@@ -41,7 +42,9 @@ export default {
   },
   private: {
     imageID: null,
-    songURL: null
+    songURL: null,
+    songName: "正在加载",
+    author: "Loading"
   },
 
   fetchBeatmapInfo(key, beatmap) {
@@ -108,15 +111,13 @@ export default {
     try {
       console.log("调用歌曲解析方法")
       const beatmapsInfo = await this.fetchBeatmaps(this.apikey, this.songID)
-      console.log("获取的JSON原始数据：" + beatmapsInfo)
-      console.log("传回图片ID")
       this.imageID = beatmapsInfo[0].beatmapset_id
       if (beatmapsInfo && beatmapsInfo.length > 0) {
         const firstItem = beatmapsInfo[0]
         this.imageID = firstItem.beatmapset_id
-        console.log("成功获取图片 ID:", this.imageID)
+        this.songName = firstItem.title
+        this.author = firstItem.artist + " / " + firstItem.creator
       } else {
-        console.warn("未获取到谱面数组或数组为空")
       }
     } catch (err) {
       console.error("onShow 执行出错:", err)
@@ -160,7 +161,14 @@ export default {
   text-align: center;
   font-weight: bold;
 }
-
+.subTitle {
+  font-size: 30px;
+  color: white;
+}
+.defaultContent {
+  font-size: 20px;
+  color: #999999;
+}
 .btn {
   width: 100%;
   height: 80px;
@@ -171,24 +179,32 @@ export default {
   color: #ffffff;
 }
 .largeCard {
+  display: flex;
+  flex-direction: row;
   width: 100%;
+  height: auto;
   margin-top: 10px;
   border-radius: 20px;
-  padding: 20%;
+  padding: 10%;
   background-color: #222222;
   font-size: 30px;
   color: #ffffff;
+  justify-content: space-between;
+  align-items: center;
 }
 .imageContainer {
   width: 50%;
-  height: 100%;
   border-radius: 20px;
+  align-self: center;
 }
 .textContainer {
   width: 45%;
+  align-self: center;
+  flex-direction: column;
 }
 .image {
   border-radius: 20px;
+  width: 100%;
 }
 
 .goBackBtn {
